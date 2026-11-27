@@ -1,0 +1,97 @@
+<ion-app
+  [class.rs-authenticated-shell]="mostrarNavegacionAutenticada"
+  [class.delegate-mode]="usuario?.rol === 'delegado'"
+  [class.parent-mode]="usuario?.rol === 'apoderado'"
+  [class.driver-mode]="usuario?.rol === 'conductor'">
+
+  @if (mostrarNavegacionAutenticada) {
+    <ion-menu contentId="main-content" menuId="main-menu" type="overlay">
+      <ion-content>
+        <div class="sidebar-container">
+          <ion-menu-toggle autoHide="false">
+            <div
+              class="sidebar-header clickable-header"
+              [routerLink]="usuario?.rol === 'conductor' ? ['/conductor/perfil'] : (usuario?.rol === 'delegado' ? ['/delegado/perfil'] : ['/apoderado/perfil'])"
+              title="Ver mi perfil">
+              <div class="user-avatar"><ion-icon name="person-outline"></ion-icon></div>
+              <div class="user-info">
+                <span class="user-role">{{ usuario?.rol === 'conductor' ? 'Conductor' : (usuario?.rol === 'delegado' ? 'Delegado' : 'Apoderado') }}</span>
+                <h3>{{ usuario?.first_name || 'Usuario' }} {{ usuario?.last_name || '' }}</h3>
+                <p>{{ usuario?.email || '' }}</p>
+              </div>
+            </div>
+          </ion-menu-toggle>
+
+          <div class="menu-items">
+            @if (usuario?.rol === 'conductor') {
+              <p class="menu-section-label">HERRAMIENTAS</p>
+              <ion-menu-toggle autoHide="false">
+                <a [routerLink]="['/conductor/escanear-qr']" class="menu-item" routerLinkActive="active">
+                  <ion-icon name="qr-code-outline" class="item-icon"></ion-icon><span>Escanear QR</span>
+                </a>
+              </ion-menu-toggle>
+            } @else if (usuario?.rol === 'apoderado') {
+              <p class="menu-section-label">GESTIONES</p>
+              <ion-menu-toggle autoHide="false">
+                <a [routerLink]="['/agregar-hijo']" class="menu-item" routerLinkActive="active">
+                  <ion-icon name="person-add-outline" class="item-icon"></ion-icon><span>Agregar hijo</span>
+                </a>
+              </ion-menu-toggle>
+              <ion-menu-toggle autoHide="false">
+                <a [routerLink]="['/apoderado/mi-qr']" class="menu-item" routerLinkActive="active">
+                  <ion-icon name="qr-code-outline" class="item-icon"></ion-icon><span>Mi QR</span>
+                </a>
+              </ion-menu-toggle>
+            } @else {
+              <p class="menu-section-label">CUENTA</p>
+              <div class="sidebar-note">
+                <ion-icon name="shield-checkmark-outline"></ion-icon>
+                <div>
+                  <strong>Cuenta verificada</strong>
+                  <span>Usa la barra inferior para navegar.</span>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="sidebar-footer">
+            <button class="logout-btn" type="button" (click)="cerrarSesion()">
+              <ion-icon name="log-out-outline" class="item-icon"></ion-icon><span>Cerrar sesión</span>
+            </button>
+          </div>
+        </div>
+      </ion-content>
+    </ion-menu>
+  }
+
+  <ion-router-outlet id="main-content"></ion-router-outlet>
+
+  @if (mostrarNavegacionAutenticada && bottomNavItems.length) {
+    <nav
+      class="rs-bottom-nav"
+      [style.--rs-nav-columns]="bottomNavItems.length"
+      [attr.aria-label]="bottomNavLabel"
+    >
+      @for (item of bottomNavItems; track item.route) {
+        <a
+          [routerLink]="[item.route]"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.exact || false }"
+          [class.rs-nav-item--featured]="item.variant === 'featured'"
+          [class.rs-nav-item--danger]="item.variant === 'danger'"
+          [class.rs-nav-item--notifications]="item.variant === 'notifications'"
+        >
+          @if (item.variant === 'featured') {
+            <span class="rs-nav-featured-icon"><ion-icon [name]="item.icon"></ion-icon></span>
+          } @else {
+            <ion-icon [name]="item.icon"></ion-icon>
+          }
+          <span>{{ item.label }}</span>
+          @if (item.variant === 'notifications' && (notificationService.unreadCount$ | async); as count) {
+            @if (count > 0) { <strong class="nav-badge">{{ count > 9 ? '9+' : count }}</strong> }
+          }
+        </a>
+      }
+    </nav>
+  }
+</ion-app>

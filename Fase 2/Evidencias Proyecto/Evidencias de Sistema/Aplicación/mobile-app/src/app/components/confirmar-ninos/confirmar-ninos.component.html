@@ -1,0 +1,55 @@
+<div class="confirmar-ninos-fondo" (click)="revisar.emit()">
+  <div
+    class="confirmar-ninos"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="confirmarNinosTitulo"
+    (click)="$event.stopPropagation()">
+
+    <div class="confirmar-ninos__icono">
+      <ion-icon name="people-outline"></ion-icon>
+    </div>
+
+    <h2 id="confirmarNinosTitulo">¿Seguro que {{ seleccionados.length === 1 ? 'es este niño' : 'son estos niños' }}?</h2>
+
+    <p class="confirmar-ninos__texto">
+      @if (esSubida) {
+        {{ seleccionados.length === 1 ? 'Va a subir' : 'Van a subir' }} al furgón con el QR de
+      } @else {
+        {{ seleccionados.length === 1 ? 'Se entregará' : 'Se entregarán' }} a
+      }
+      <strong>{{ persona || 'quien mostró el QR' }}</strong>.
+    </p>
+
+    <ul class="confirmar-ninos__lista">
+      @for (est of seleccionados; track est.id) {
+        <li>
+          <span class="confirmar-ninos__avatar">{{ iniciales(est.nombre) }}</span>
+          <span class="confirmar-ninos__datos">
+            <strong>{{ est.nombre }}</strong>
+            <small>{{ est.curso || 'Sin curso' }} · RUT {{ est.rut }}</small>
+          </span>
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+        </li>
+      }
+    </ul>
+
+    @if (noSeleccionados.length > 0) {
+      <p class="confirmar-ninos__nota">
+        No {{ esSubida ? 'suben' : 'se entregan' }}:
+        @for (est of noSeleccionados; track est.id; let ultimo = $last) {
+          {{ est.nombre }}{{ ultimo ? '' : ', ' }}
+        }
+      </p>
+    }
+
+    <div class="confirmar-ninos__botones">
+      <button type="button" class="confirmar-ninos__btn confirmar-ninos__btn--revisar" (click)="revisar.emit()">
+        Revisar
+      </button>
+      <button type="button" class="confirmar-ninos__btn confirmar-ninos__btn--si" (click)="confirmar.emit()">
+        Sí, confirmar
+      </button>
+    </div>
+  </div>
+</div>

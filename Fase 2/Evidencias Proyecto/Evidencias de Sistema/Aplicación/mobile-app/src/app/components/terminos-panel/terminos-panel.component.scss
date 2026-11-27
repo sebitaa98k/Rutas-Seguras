@@ -1,0 +1,101 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.terminos {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--rs-color-surface);
+  color: var(--rs-color-text);
+}
+
+.estado {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+}
+
+header {
+  flex: none;
+  padding: calc(16px + var(--ion-safe-area-top, 0px)) 20px 12px;
+  border-bottom: 1px solid var(--rs-color-border);
+
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  span {
+    color: var(--rs-color-text-muted);
+    font-size: 12px;
+  }
+}
+
+.texto {
+  flex: 1;
+  min-height: 0;
+  padding: 4px 20px 20px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+
+  h3 {
+    margin: 18px 0 6px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0 0 10px;
+    color: var(--rs-color-text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+}
+
+footer {
+  flex: none;
+  padding: 12px 20px calc(8px + var(--ion-safe-area-bottom, 0px));
+  border-top: 1px solid var(--rs-color-border);
+
+  ion-checkbox {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  ion-checkbox::part(label) {
+    white-space: normal;
+  }
+
+  ion-button {
+    margin: 0;
+  }
+}
+
+.aviso {
+  margin: 0 0 10px;
+  color: var(--rs-color-primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.aviso-biometria {
+  margin: 4px 0 10px;
+  color: var(--rs-color-text-secondary, #475569);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.casilla {
+  display: block;
+  font-size: 13px;
+  line-height: 1.35;
+  white-space: normal;
+}

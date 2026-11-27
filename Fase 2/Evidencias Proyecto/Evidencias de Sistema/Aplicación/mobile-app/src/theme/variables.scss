@@ -1,0 +1,116 @@
+/* ===========================================================================
+   RUTAS SEGURAS - DESIGN TOKENS GLOBALES
+   Fuente de verdad compartida con Web Admin.
+   ========================================================================== */
+
+:root {
+  /* Identidad */
+  --rs-color-primary: #0f766e;
+  --rs-color-primary-hover: #0b5f59;
+  --rs-color-primary-soft: #e8f5f3;
+  --rs-color-primary-subtle: #f2f8f7;
+
+  /* Superficies */
+  --rs-color-background: #f7faf9;
+  --rs-color-surface: #ffffff;
+  --rs-color-surface-warm: #fffdf8;
+  --rs-color-surface-soft: #f8fafc;
+
+  /* Texto y bordes */
+  --rs-color-text: #173330;
+  --rs-color-text-muted: #6b7c79;
+  --rs-color-text-soft: #8a9996;
+  --rs-color-border: #dce7e5;
+  --rs-color-border-soft: #edf2f1;
+
+  /* Acento y estados */
+  --rs-color-accent: #f4b52b;
+  --rs-color-accent-soft: #fff4d6;
+  --rs-color-success: #16805f;
+  --rs-color-success-soft: #e7f6ef;
+  --rs-color-warning: #b66a08;
+  --rs-color-warning-soft: #fef3c7;
+  --rs-color-danger: #b42318;
+  --rs-color-danger-soft: #feeceb;
+  --rs-color-info: #2563a8;
+  --rs-color-info-soft: #e8f1fb;
+
+  /* Tipografía */
+  --rs-font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --rs-font-size-xs: 0.75rem;
+  --rs-font-size-sm: 0.8125rem;
+  --rs-font-size-md: 0.875rem;
+  --rs-font-size-base: 1rem;
+  --rs-font-size-lg: 1.125rem;
+  --rs-font-size-xl: 1.5rem;
+  --rs-font-size-2xl: 1.875rem;
+  --rs-font-weight-regular: 400;
+  --rs-font-weight-medium: 500;
+  --rs-font-weight-semibold: 600;
+  --rs-font-weight-bold: 700;
+  --rs-font-weight-extrabold: 800;
+  --rs-line-height-tight: 1.2;
+  --rs-line-height-base: 1.5;
+  --rs-line-height-relaxed: 1.7;
+
+  /* Espaciado */
+  --rs-space-1: 4px;
+  --rs-space-2: 8px;
+  --rs-space-3: 12px;
+  --rs-space-4: 16px;
+  --rs-space-5: 20px;
+  --rs-space-6: 24px;
+  --rs-space-8: 32px;
+  --rs-space-10: 40px;
+
+  /* Geometría */
+  --rs-radius-sm: 8px;
+  --rs-radius-md: 12px;
+  --rs-radius-lg: 16px;
+  --rs-radius-xl: 20px;
+  --rs-radius-pill: 9999px;
+
+  /* Profundidad */
+  --rs-shadow-card: 0 4px 16px rgba(23, 51, 48, 0.06);
+  --rs-shadow-raised: 0 8px 24px rgba(23, 51, 48, 0.1);
+  --rs-shadow-navigation: 0 -8px 24px rgba(23, 51, 48, 0.08);
+
+  /* Controles base para adopción gradual */
+  --rs-control-height: 48px;
+  --rs-control-padding-inline: 16px;
+  --rs-button-height: 44px;
+  --rs-button-radius: var(--rs-radius-md);
+  --rs-card-radius: var(--rs-radius-lg);
+  --rs-card-padding: var(--rs-space-4);
+  --rs-input-radius: var(--rs-radius-md);
+  --rs-input-border: var(--rs-color-border);
+  --rs-focus-ring: 0 0 0 3px rgba(15, 118, 110, 0.18);
+  --rs-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Integración Ionic */
+  --ion-font-family: var(--rs-font-family);
+  --ion-color-primary: var(--rs-color-primary);
+  --ion-color-primary-rgb: 15, 118, 110;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #0d6861;
+  --ion-color-primary-tint: #27847d;
+
+  /* Alias de compatibilidad con estilos Mobile existentes */
+  --verde-rutas: var(--rs-color-primary);
+  --verde-rutas-oscuro: var(--rs-color-primary-hover);
+  --verde-petroleo: var(--rs-color-primary);
+  --verde-petroleo-oscuro: var(--rs-color-primary-hover);
+  --verde-suave: var(--rs-color-primary-soft);
+  --verde-muy-suave: var(--rs-color-primary-subtle);
+  --amarillo-escolar: var(--rs-color-accent);
+  --amarillo-suave: var(--rs-color-accent-soft);
+  --fondo: var(--rs-color-background);
+  --blanco: var(--rs-color-surface);
+  --texto-principal: var(--rs-color-text);
+  --texto-secundario: var(--rs-color-text-muted);
+  --texto-suave: var(--rs-color-text-soft);
+  --borde: var(--rs-color-border);
+  --borde-suave: var(--rs-color-border-soft);
+}

@@ -1,0 +1,85 @@
+<ion-content [fullscreen]="true">
+
+  <div class="seguimiento-page">
+
+    <!-- BOTÓN VOLVER -->
+    <button class="back-button rs-header-action" type="button" (click)="volver()">
+      <ion-icon name="arrow-back-outline"></ion-icon>
+    </button>
+
+    <!-- HEADER -->
+    <div class="header-banner">
+      <div class="badge-role">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+        <span>DELEGADO AUTORIZADO</span>
+      </div>
+      <h1>Seguimiento de Ruta Escolar</h1>
+      <p>Supervisa la ubicación en tiempo real del furgón escolar asignado</p>
+    </div>
+
+    <!-- MAPA INTERACTIVO / VISUALIZADOR -->
+    <div class="map-container">
+      @if (hayDatosMapa) {
+      <div id="mapa-seguimiento-delegado" class="mapa-leaflet"></div>
+      } @else {
+      <div class="map-empty">Esperando información de la ruta y ubicación GPS…</div>
+      }
+      @if (seguimiento?.ruta?.estado === 'en_camino') {
+      <div class="live-pill">
+        <span class="pulse-dot"></span> EN VIVO
+      </div>
+      }
+    </div>
+
+    <!-- DETALLES DE LA RUTA -->
+    <div class="details-card">
+      @if (cargando) {
+      <div class="center-box">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Obteniendo ubicación del vehículo...</p>
+      </div>
+      } @else if (error) {
+      <div class="center-box error-box">
+        <p>{{ error }}</p>
+        <button class="refresh-btn" (click)="cargarSeguimiento()" title="Reintentar">
+          <ion-icon name="refresh-outline"></ion-icon>
+        </button>
+      </div>
+      } @else {
+
+      <div class="status-box">
+        <div class="status-icon">🚌</div>
+        <div class="status-info">
+          <h3>{{ seguimiento?.ruta?.nombre || 'Ruta Escolar Principal' }}</h3>
+          <p>Estado: <strong>{{ seguimiento?.ruta?.estado === 'en_camino' ? 'En recorrido' : 'No hay rutas activas' }}</strong></p>
+          @if (seguimiento?.ruta?.estado !== 'en_camino' && seguimiento?.ultima_ruta_terminada; as terminada) {
+          <p class="ruta-terminada">
+            La ruta {{ terminada.sentido === 'hacia_colegio' ? 'de ida' : 'de vuelta' }} "{{ terminada.nombre }}"
+            terminó a las {{ terminada.hora }}.
+          </p>
+          }
+        </div>
+        <button class="refresh-btn" (click)="cargarSeguimiento()" title="Actualizar">
+          <ion-icon name="refresh-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="driver-card">
+        <div class="driver-info">
+          <span class="label">Conductor a cargo:</span>
+          <strong>{{ seguimiento?.conductor?.nombre || 'Conductor asignado' }}</strong>
+          <span class="patente">Furgón Escolar Autorizado</span>
+        </div>
+        @if (seguimiento?.conductor?.telefono) {
+        <button class="call-btn" (click)="contactarConductor()">
+          <ion-icon name="call-outline"></ion-icon>
+        </button>
+        }
+      </div>
+
+      }
+    </div>
+
+  </div>
+
+</ion-content>

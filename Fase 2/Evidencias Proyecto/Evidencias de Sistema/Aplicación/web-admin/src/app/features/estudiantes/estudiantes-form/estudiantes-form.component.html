@@ -1,0 +1,238 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1>{{ isEditMode ? 'Editar Estudiante' : 'Nuevo Estudiante' }}</h1>
+      <p class="subtitle">{{ isEditMode ? 'Modifica los datos del estudiante' : 'Registra un nuevo estudiante en el sistema' }}</p>
+    </div>
+    <a routerLink="/estudiantes" class="btn btn-secondary rs-btn rs-btn--secondary">← Volver al listado</a>
+  </div>
+
+  @if (errorMessage) {
+    <div class="alert alert-danger">{{ errorMessage }}</div>
+  }
+
+  <div class="form-card rs-card">
+    <form [formGroup]="estudianteForm" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <!-- Nombre -->
+        <div class="form-group">
+          <label for="nombre">Nombres del Estudiante *</label>
+          <input
+            id="nombre"
+            type="text"
+            formControlName="nombre"
+            placeholder="ej: Oliver"
+            [class.invalid]="isFieldInvalid('nombre')"
+          />
+          @if (isFieldInvalid('nombre')) {
+            <span class="error-text">El nombre es obligatorio (mínimo 2 caracteres).</span>
+          }
+        </div>
+
+        <!-- Apellido -->
+        <div class="form-group">
+          <label for="apellido">Apellidos del Estudiante *</label>
+          <input
+            id="apellido"
+            type="text"
+            formControlName="apellido"
+            placeholder="ej: Reyes"
+            [class.invalid]="isFieldInvalid('apellido')"
+          />
+          @if (isFieldInvalid('apellido')) {
+            <span class="error-text">El apellido es obligatorio (mínimo 2 caracteres).</span>
+          }
+        </div>
+
+        <!-- RUT -->
+        <div class="form-group">
+          <label for="rut">RUT del Estudiante *</label>
+          <input
+            id="rut"
+            type="text"
+            formControlName="rut"
+            placeholder="ej: 23.456.789-0"
+            [class.invalid]="isFieldInvalid('rut')"
+          />
+          @if (isFieldInvalid('rut')) {
+            <span class="error-text">El RUT es obligatorio.</span>
+          }
+        </div>
+
+        <!-- Fecha Nacimiento -->
+        <div class="form-group">
+          <label for="fecha_nacimiento">Fecha de Nacimiento *</label>
+          <input
+            id="fecha_nacimiento"
+            type="date"
+            formControlName="fecha_nacimiento"
+            [class.invalid]="isFieldInvalid('fecha_nacimiento')"
+          />
+          @if (isFieldInvalid('fecha_nacimiento')) {
+            <span class="error-text">La fecha de nacimiento es obligatoria.</span>
+          }
+        </div>
+
+        <!-- Colegio (Solo Admin Plataforma) -->
+        @if (esAdminPlataforma()) {
+          <div class="form-group">
+            <label for="colegio">Establecimiento Educativo (Colegio) *</label>
+            <select id="colegio" formControlName="colegio" (change)="onColegioChange()">
+              <option [ngValue]="null">-- Seleccionar Colegio --</option>
+              @for (col of colegios(); track col.id) {
+                <option [ngValue]="col.id">{{ col.nombre }}</option>
+              }
+            </select>
+            @if (isFieldInvalid('colegio')) {
+              <span class="error-text">Selecciona el colegio del estudiante.</span>
+            }
+          </div>
+        }
+
+        <!-- Sede: solo en colegios multisede. En los demás se usa la única sede, sin mostrarla. -->
+        @if (!sedeOculta()) {
+        <div class="form-group">
+          <label for="sede">Sede Institucional *</label>
+          <select
+            id="sede"
+            formControlName="sede"
+            [attr.aria-busy]="cargandoSedes()"
+            [class.invalid]="isFieldInvalid('sede')"
+            [disabled]="cargandoSedes() || (esAdminPlataforma() && !estudianteForm.get('colegio')?.value)"
+          >
+            <option [ngValue]="null">
+              {{ cargandoSedes() ? 'Cargando sedes...' : '-- Seleccione una sede --' }}
+            </option>
+            @for (s of sedes(); track s.id) {
+              <option [ngValue]="s.id">{{ s.nombre }}</option>
+            }
+          </select>
+          @if (errorSedes()) {
+            <span class="error-text">{{ errorSedes() }}</span>
+          } @else if (!cargandoSedes() && estudianteForm.get('colegio')?.value && sedes().length === 0) {
+            <span class="error-text">Este colegio no tiene sedes activas. Revisa sus sedes antes de registrar estudiantes.</span>
+          } @else if (isFieldInvalid('sede')) {
+            <span class="error-text">La sede es obligatoria.</span>
+          }
+        </div>
+        }
+
+        <!-- Curso -->
+        <div class="form-group">
+          <label for="curso">Curso / Nivel *</label>
+          <select id="curso" formControlName="curso" [class.invalid]="isFieldInvalid('curso')">
+            <option value="">Seleccione un curso</option>
+            @for (curso of cursos; track curso) {
+              <option [value]="curso">{{ curso }}</option>
+            }
+          </select>
+          @if (isFieldInvalid('curso')) {
+            <span class="error-text">El curso o nivel es obligatorio.</span>
+          }
+        </div>
+
+        <!-- Apoderado Tutor -->
+        <div class="form-group">
+          <label for="apoderado">Apoderado / Tutor Responsable *</label>
+          <select id="apoderado" formControlName="apoderado">
+            <option [ngValue]="null">-- Seleccionar Apoderado --</option>
+            @for (apod of apoderados(); track apod.id) {
+              <option [ngValue]="apod.perfil_id || apod.id">{{ apod.nombre_completo || apod.usuario }} ({{ apod.rut || apod.email }})</option>
+            }
+          </select>
+          @if (isFieldInvalid('apoderado')) {
+            <span class="error-text">Selecciona un apoderado responsable.</span>
+          }
+        </div>
+
+        <!-- Dirección Principal -->
+        <div class="form-group full-width">
+          <app-selector-ubicacion
+            etiqueta="Dirección Principal"
+            placeholder="Av. Las Condes 1234, Dpto 502"
+            textoMarcador="Domicilio del estudiante"
+            [requerido]="true"
+            [invalido]="isFieldInvalid('direccion_principal') || isFieldInvalid('comuna') || isFieldInvalid('region')"
+            [direccion]="estudianteForm.get('direccion_principal')?.value"
+            [comuna]="estudianteForm.get('comuna')?.value"
+            [region]="estudianteForm.get('region')?.value"
+            [latitud]="estudianteForm.get('latitud')?.value"
+            [longitud]="estudianteForm.get('longitud')?.value"
+            [latitudReferencia]="puntoReferencia?.latitud"
+            [longitudReferencia]="puntoReferencia?.longitud"
+            (ubicacionCambio)="ubicacionCambio($event)"
+          />
+          @if (isFieldInvalid('direccion_principal') || isFieldInvalid('comuna') || isFieldInvalid('region')) {
+            <span class="error-text">La región, la comuna y la dirección (calle y número) son obligatorias.</span>
+          }
+        </div>
+
+        <!-- Quién puede recibirlo (solo lectura) -->
+        <section class="quien-recibe full-width">
+          <h3>Quién puede recibirlo</h3>
+
+          <dl>
+            <dt>Apoderado</dt>
+            <dd>{{ apoderadoElegido?.nombre_completo || apoderadoElegido?.usuario || 'Selecciona un apoderado' }}</dd>
+
+            @if (isEditMode) {
+              <dt>Personas autorizadas</dt>
+              <dd>
+                @for (persona of personasAutorizadas(); track persona.rut) {
+                  <span>{{ persona.nombre }} ({{ persona.rut }})</span>
+                } @empty {
+                  <span>Sin personas autorizadas</span>
+                }
+              </dd>
+
+              <dt>Inspectores de su sede</dt>
+              <dd>
+                @for (inspector of inspectores(); track inspector) {
+                  <span>{{ inspector }}</span>
+                } @empty {
+                  <span>Sin inspectores registrados</span>
+                }
+              </dd>
+            }
+          </dl>
+
+          @if (!isEditMode) {
+            <p>Las personas autorizadas y los inspectores se muestran después de registrar al estudiante.</p>
+          }
+          <p>Las personas autorizadas las agrega el apoderado desde la app.</p>
+        </section>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary rs-btn rs-btn--primary" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Guardando...' : (isEditMode ? 'Guardar Cambios' : 'Registrar Estudiante') }}
+        </button>
+        <button type="button" class="btn btn-secondary rs-btn rs-btn--secondary" (click)="onCancel()">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+@if (confirmandoApoderado()) {
+  <div class="confirmar-backdrop" (click)="revisarApoderado()">
+    <div class="confirmar-card" role="dialog" aria-modal="true" aria-labelledby="confirmar-apoderado-titulo" (click)="$event.stopPropagation()">
+      <h3 id="confirmar-apoderado-titulo">¿Es el apoderado correcto?</h3>
+      <p class="confirmar-ayuda">Revisa que este estudiante quede a cargo de la persona correcta: recibirá sus avisos y podrá retirarlo.</p>
+      <dl class="confirmar-datos">
+        <dt>Estudiante</dt>
+        <dd>{{ estudianteForm.value.nombre }} {{ estudianteForm.value.apellido }} · {{ estudianteForm.value.rut }}</dd>
+        <dt>Apoderado</dt>
+        <dd>
+          <strong>{{ apoderadoElegido?.nombre_completo || apoderadoElegido?.usuario || '—' }}</strong><br />
+          RUT {{ apoderadoElegido?.rut || '—' }} · {{ apoderadoElegido?.email || apoderadoElegido?.usuario || '—' }}
+          @if (apoderadoElegido?.telefono) { · {{ apoderadoElegido?.telefono }} }
+        </dd>
+      </dl>
+      <div class="confirmar-acciones">
+        <button type="button" class="btn btn-secondary rs-btn rs-btn--secondary" (click)="revisarApoderado()">Revisar</button>
+        <button type="button" class="btn btn-primary rs-btn rs-btn--primary" (click)="confirmarApoderado()">Sí, es correcto</button>
+      </div>
+    </div>
+  </div>
+}
+

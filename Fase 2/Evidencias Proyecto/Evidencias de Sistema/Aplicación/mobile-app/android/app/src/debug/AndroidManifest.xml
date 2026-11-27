@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Django se sirve por HTTP durante el desarrollo local. Esta excepción
+         solo se fusiona en builds debug y no afecta una versión release. -->
+    <application android:usesCleartextTraffic="true" />
+</manifest>

@@ -1,0 +1,172 @@
+<div class="form-container">
+  <div class="form-header">
+    <h2>{{ isEditMode() ? 'Editar ruta' : 'Crear nueva ruta' }}</h2>
+    <p>Configura el colegio o sede de destino, el sentido del recorrido, el vehículo y sus estudiantes.</p>
+  </div>
+
+  @if (errorMensaje()) {
+    <div class="form-alert" role="alert">{{ errorMensaje() }}</div>
+  }
+
+  <form [formGroup]="rutaForm" (ngSubmit)="onSubmit()" class="form-card">
+    <div class="form-section">
+      <h3>Información general</h3>
+      <div class="form-grid">
+        <div class="rs-form-field full-width">
+          <label class="rs-label" for="nombre">Nombre de la ruta</label>
+          <input class="rs-input" id="nombre" type="text" formControlName="nombre" placeholder="Ej: Ruta 01 - Zona Norte" />
+        </div>
+        <div class="rs-form-field">
+          <label class="rs-label" for="colegio">Colegio</label>
+          <select class="rs-select" id="colegio" formControlName="colegio" (change)="onColegioChange()">
+            <option [ngValue]="null">Seleccionar colegio</option>
+            @for (colegio of colegios(); track colegio.id) {
+              <option [ngValue]="colegio.id">{{ colegio.nombre }}</option>
+            }
+          </select>
+        </div>
+        <!-- Sede: solo en colegios multisede. En los demás se usa la única sede, sin mostrarla. -->
+        @if (!sedeOculta()) {
+        <div class="rs-form-field">
+          <label class="rs-label" for="sede">Sede *</label>
+          <select class="rs-select" id="sede" formControlName="sede">
+            <option [ngValue]="null">Seleccione una sede</option>
+            @for (sede of sedes(); track sede.id) {
+              <option [ngValue]="sede.id">{{ sede.nombre }}{{ sede.direccion ? ' - ' + sede.direccion : '' }}{{ sede.comuna ? ', ' + sede.comuna : '' }}</option>
+            }
+          </select>
+        </div>
+        }
+        <div class="rs-form-field">
+          <label class="rs-label" for="conductor">Conductor</label>
+          <select class="rs-select" id="conductor" formControlName="conductor_id">
+            <option [ngValue]="null">Sin conductor por ahora</option>
+            @for (conductor of conductoresDisponibles(); track conductor.id) {
+              <option [ngValue]="conductor.perfil_id">{{ conductor.nombre_completo || conductor.email }}</option>
+            }
+          </select>
+        </div>
+        <div class="rs-form-field">
+          <label class="rs-label" for="furgon">Furgón</label>
+          <select class="rs-select" id="furgon" formControlName="furgon">
+            <option [ngValue]="null">Sin furgón por ahora</option>
+            @for (furgon of furgonesDisponibles(); track furgon.id) {
+              <option [ngValue]="furgon.id">{{ furgon.patente }} · {{ furgon.capacidad }} cupos{{ furgon.conductor ? ' · ' + furgon.conductor : '' }}</option>
+            }
+          </select>
+        </div>
+        @if (!rutaForm.value.conductor_id || !rutaForm.value.furgon) {
+          <p class="rs-help full-width">
+            Puedes guardar la ruta sin conductor o sin furgón (por ejemplo, para intercambiar furgones),
+            pero no se podrá iniciar hasta tener ambos. Un furgón solo puede tener un conductor.
+          </p>
+        }
+        <div class="rs-form-field full-width">
+          <label class="rs-label" id="estudiantes-label">Estudiantes asignados</label>
+          <div class="students-selector" role="group" aria-labelledby="estudiantes-label">
+            <div class="students-selector-header">
+              <strong>
+                {{ estudiantesSeleccionados().length }}
+                {{ estudiantesSeleccionados().length === 1 ? 'estudiante seleccionado' : 'estudiantes seleccionados' }}
+              </strong>
+              @if (estudiantesDisponibles().length > 1) {
+                <label class="select-all-option">
+                  <input
+                    type="checkbox"
+                    [checked]="todosSeleccionados()"
+                    [indeterminate]="algunosSeleccionados()"
+                    (change)="alternarTodos($event)">
+                  <span>Seleccionar todos</span>
+                </label>
+              }
+            </div>
+
+            <div class="students-list">
+              @for (estudiante of estudiantesDisponibles(); track estudiante.id) {
+                <label class="student-option" [class.selected]="estudianteSeleccionado(estudiante.id)">
+                  <input
+                    type="checkbox"
+                    [checked]="estudianteSeleccionado(estudiante.id)"
+                    (change)="alternarEstudiante(estudiante.id, $event)">
+                  <span class="student-check" aria-hidden="true"></span>
+                  <span class="student-info">
+                    <strong>{{ estudiante.nombre }} {{ estudiante.apellido }}</strong>
+                    <small>{{ estudiante.curso || 'Curso no informado' }}</small>
+                  </span>
+                </label>
+              } @empty {
+                <div class="students-empty">No hay estudiantes disponibles para este colegio.</div>
+              }
+            </div>
+          </div>
+          <span class="field-hint">Solo aparecen estudiantes del colegio con ubicación confirmada por su apoderado.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h3>Recorrido</h3>
+      <div class="form-grid">
+        <div class="rs-form-field full-width">
+          <label class="rs-label" for="sentido">Sentido de la ruta</label>
+          <select class="rs-select" id="sentido" formControlName="sentido">
+            <option value="hacia_colegio">Hacia el colegio</option>
+            <option value="desde_colegio">Desde el colegio</option>
+          </select>
+        </div>
+
+        <div class="rs-form-field full-width">
+          <label class="rs-label" for="hora_programada">{{ rutaForm.value.sentido === 'hacia_colegio' ? 'Hora de llegada al colegio' : 'Hora de salida del colegio' }} *</label>
+          <input class="rs-input" id="hora_programada" type="time" formControlName="hora_programada" />
+          <small>Se usa en Auditoría y Reportes para medir la puntualidad.</small>
+        </div>
+
+        @if (!sedeOculta() && sedeSeleccionada(); as sede) {
+          <div class="location-summary full-width">
+            <strong>{{ rutaForm.value.sentido === 'hacia_colegio' ? 'Destino automático' : 'Origen automático' }}: {{ sede.nombre }}</strong>
+            <span>{{ sede.direccion ? sede.direccion + (sede.comuna ? ', ' + sede.comuna : '') : 'Sin dirección registrada' }}</span>
+            <span>Coordenadas sede: {{ sede.latitud ?? 'pendiente' }}, {{ sede.longitud ?? 'pendiente' }}</span>
+          </div>
+        } @else if (colegioSeleccionado(); as colegio) {
+          <div class="location-summary full-width">
+            <strong>{{ rutaForm.value.sentido === 'hacia_colegio' ? 'Destino automático' : 'Origen automático' }}: {{ colegio.nombre }}</strong>
+            <span>{{ colegio.direccion ? colegio.direccion + (colegio.comuna ? ', ' + colegio.comuna : '') : 'Sin dirección registrada' }}</span>
+            <span>Coordenadas colegio: {{ colegio.latitud ?? 'pendiente' }}, {{ colegio.longitud ?? 'pendiente' }}</span>
+            @if (colegio.latitud == null || colegio.longitud == null) {
+              <span class="rs-field-error">El colegio necesita coordenadas antes de crear rutas sin sede.</span>
+            }
+          </div>
+        }
+
+        <div class="location-summary full-width">
+          <strong>Direcciones de estudiantes</strong>
+          <span>
+            Las direcciones y coordenadas se toman desde la ubicación confirmada por cada apoderado.
+            El administrador no debe volver a buscarlas ni modificarlas desde la ruta.
+          </span>
+        </div>
+
+        <div class="rs-form-field">
+          <label class="rs-label" for="estado">Estado</label>
+          <select class="rs-select" id="estado" formControlName="estado">
+            <option value="activa">Activa</option>
+            <option value="inactiva">Inactiva</option>
+            @if (isEditMode()) {
+              <option value="finalizada">Finalizada</option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+
+    @if (rutaForm.invalid && rutaForm.touched) {
+      <span class="rs-field-error">Completa todos los campos obligatorios y revisa las coordenadas.</span>
+    }
+    <div class="form-actions">
+      <button type="button" class="btn-secondary rs-btn rs-btn--secondary" (click)="cancelar()">Cancelar</button>
+      <button type="submit" class="btn-primary rs-btn rs-btn--primary" [disabled]="guardando() || cargando() || rutaEnCurso()">
+        {{ guardando() ? 'Guardando…' : (isEditMode() ? 'Actualizar' : 'Guardar') }}
+      </button>
+    </div>
+  </form>
+</div>

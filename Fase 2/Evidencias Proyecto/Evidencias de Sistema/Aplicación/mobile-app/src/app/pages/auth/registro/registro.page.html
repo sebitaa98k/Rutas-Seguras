@@ -1,0 +1,289 @@
+<ion-content [fullscreen]="true">
+
+  <div class="register-page">
+
+    <!-- Cabecera -->
+    <section class="hero-section">
+
+      <div class="logo-circle">
+        <span>RS</span>
+      </div>
+
+      <h1>Crear cuenta</h1>
+
+      <p>
+        Únete a Rutas Seguras
+      </p>
+
+    </section>
+
+
+    <!-- Formulario -->
+    <section class="register-card">
+
+      <div class="form-header">
+
+        <span class="welcome-label">
+          Nuevo apoderado
+        </span>
+
+        <h2>
+          Crea tu cuenta
+        </h2>
+
+        <p>
+          Completa tus datos para comenzar a utilizar
+          Rutas Seguras.
+        </p>
+
+      </div>
+
+
+      <form class="rs-form" (ngSubmit)="onSubmit()">
+
+
+        <!-- DATOS PERSONALES -->
+
+        <div class="section-title">
+          <span>01</span>
+          <h3>Datos personales</h3>
+        </div>
+
+
+        <div class="field rs-field">
+
+          <ion-item lines="none" class="input-item rs-control">
+
+            <ion-select label="Colegio *" labelPlacement="stacked" placeholder="Selecciona el colegio"
+              [value]="colegioId !== undefined ? colegioId.toString() : null"
+              [selectedText]="nombreColegio || undefined"
+              (ionChange)="onColegioChange($event)">
+              @for (colegio of colegios; track colegio.id) {
+              <ion-select-option [value]="colegio.id.toString()">
+                {{ colegio.nombre }}{{ colegio.comuna ? ' · ' + colegio.comuna : '' }}
+              </ion-select-option>
+              }
+            </ion-select>
+
+          </ion-item>
+
+        </div>
+
+
+        <div class="field rs-field">
+
+          <ion-item lines="none" class="input-item rs-control">
+
+            <ion-input label="Nombre *" labelPlacement="stacked" type="text" name="nombre" [(ngModel)]="nombre"
+              placeholder="Ingresa tu nombre" required>
+            </ion-input>
+
+          </ion-item>
+
+        </div>
+
+
+        <div class="field rs-field">
+
+          <ion-item lines="none" class="input-item rs-control">
+
+            <ion-input label="Apellido *" labelPlacement="stacked" type="text" name="apellido" [(ngModel)]="apellido"
+              placeholder="Ingresa tu apellido" required>
+            </ion-input>
+
+          </ion-item>
+
+        </div>
+
+
+        <div class="field rs-field">
+
+          <ion-item lines="none" class="input-item rs-control">
+
+            <ion-input label="RUT *" labelPlacement="stacked" type="text" name="rut" [(ngModel)]="rut"
+              placeholder="12345678-9" required>
+            </ion-input>
+
+          </ion-item>
+
+        </div>
+
+
+        <div class="field rs-field">
+
+          <ion-item lines="none" class="input-item rs-control">
+
+            <ion-input label="Teléfono *" labelPlacement="stacked" type="tel" name="telefono" [(ngModel)]="telefono"
+              placeholder="+56 9 1234 5678" required>
+            </ion-input>
+
+          </ion-item>
+
+        </div>
+
+
+        <!-- CUENTA -->
+
+        <div class="section-title account-title">
+          <span>02</span>
+          <h3>Datos de acceso</h3>
+        </div>
+
+
+        <div class="field rs-field">
+
+          <ion-item lines="none" class="input-item rs-control">
+
+            <ion-input label="Correo electrónico *" labelPlacement="stacked" type="email" name="email"
+              [(ngModel)]="email" placeholder="correo@ejemplo.com" required>
+            </ion-input>
+
+          </ion-item>
+
+        </div>
+
+
+        <div class="field rs-field">
+
+          <ion-item lines="none" class="input-item rs-control">
+
+            <ion-input label="Contraseña *" labelPlacement="stacked" type="password" name="password"
+              [(ngModel)]="password" placeholder="Ingresa una contraseña" required>
+              <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+            </ion-input>
+
+          </ion-item>
+
+        </div>
+
+
+        <div class="field rs-field">
+
+          <ion-item lines="none" class="input-item rs-control">
+
+            <ion-input label="Confirmar contraseña *" labelPlacement="stacked" type="password" name="confirmarPassword"
+              [(ngModel)]="confirmarPassword" placeholder="Repite tu contraseña" required>
+              <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+            </ion-input>
+
+          </ion-item>
+
+        </div>
+
+
+        <!-- TÉRMINOS -->
+
+        <div class="section-title account-title">
+          <span>03</span>
+          <h3>Términos y condiciones</h3>
+        </div>
+
+
+        @if (versionTerminos) {
+
+        <p class="terminos-aceptados">✓ Términos aceptados</p>
+        <p class="terminos-aceptados">
+          El reconocimiento facial se autoriza después, por cada hijo, al inscribirlo.
+        </p>
+
+        } @else {
+
+        <ion-button expand="block" fill="outline" class="rs-button rs-button--secondary" (click)="terminosAbiertos = true">
+          Leer y aceptar términos
+        </ion-button>
+
+        }
+
+
+        <!-- ERROR -->
+
+        @if (errorMensaje) {
+
+        <div class="error-message rs-feedback rs-feedback--danger" role="alert">
+
+          <span>
+            {{ errorMensaje }}
+          </span>
+
+        </div>
+
+        }
+
+
+        @if (contactoColegio) {
+
+        <div class="contacto-colegio">
+
+          <strong>{{ contactoColegio.nombre }}</strong>
+
+          @if (contactoColegio.telefono) {
+          <a [href]="'tel:' + contactoColegio.telefono">{{ contactoColegio.telefono }}</a>
+          }
+
+          @if (contactoColegio.email) {
+          <a [href]="'mailto:' + contactoColegio.email">{{ contactoColegio.email }}</a>
+          }
+
+          @if (!contactoColegio.telefono && !contactoColegio.email) {
+          <span>El colegio no tiene datos de contacto registrados.</span>
+          }
+
+        </div>
+
+        }
+
+
+        <!-- BOTÓN -->
+
+        <ion-button expand="block" type="submit" class="register-button rs-button rs-button--primary" [disabled]="cargando">
+
+          @if (cargando) {
+
+          <ion-spinner name="crescent"></ion-spinner>
+
+          } @else {
+
+          Crear cuenta
+
+          }
+
+        </ion-button>
+
+
+        <!-- LOGIN -->
+
+        <div class="login-section">
+
+          <p>
+            ¿Ya tienes una cuenta?
+          </p>
+
+          <ion-button fill="clear" routerLink="/login" class="login-button rs-button rs-button--tertiary">
+
+            Iniciar sesión
+
+          </ion-button>
+
+        </div>
+
+      </form>
+
+    </section>
+
+
+    <p class="footer-text">
+      Tu seguridad comienza aquí.
+    </p>
+
+  </div>
+
+  <ion-modal [isOpen]="terminosAbiertos" [backdropDismiss]="false">
+    <ng-template>
+      <app-terminos-panel
+        (aceptar)="aceptarTerminos($event)"
+        (cancelar)="terminosAbiertos = false">
+      </app-terminos-panel>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

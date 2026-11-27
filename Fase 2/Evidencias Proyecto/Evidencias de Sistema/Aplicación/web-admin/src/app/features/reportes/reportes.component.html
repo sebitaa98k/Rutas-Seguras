@@ -1,0 +1,146 @@
+<div class="list-page fade-in">
+  <div class="list-header">
+    <div>
+      <h2>Reportes</h2>
+      <p>Resumen de los recorridos terminados: puntualidad, asistencia, entregas y emergencias.</p>
+    </div>
+  </div>
+
+  <form class="filtros glass-panel rs-card" (ngSubmit)="generar()">
+    <label>
+      Desde
+      <input type="date" name="desde" [(ngModel)]="desde" />
+    </label>
+    <label>
+      Hasta
+      <input type="date" name="hasta" [(ngModel)]="hasta" />
+    </label>
+    <label class="check">
+      <input type="checkbox" name="incluirSimulados" [(ngModel)]="incluirSimulados" />
+      Incluir recorridos simulados
+    </label>
+    <button type="submit" class="rs-btn rs-btn--primary" [disabled]="cargando">
+      {{ cargando ? 'Generando...' : 'Generar' }}
+    </button>
+    <button type="button" class="rs-btn rs-btn--secondary" [disabled]="!reporte || cargando || exportando" (click)="descargar()">
+      {{ exportando ? 'Preparando PDF...' : 'Descargar PDF' }}
+    </button>
+  </form>
+
+  @if (error) {
+    <div class="table-card glass-panel rs-card"><p class="estado-lista error" role="alert">{{ error }}</p></div>
+  }
+
+  @if (cargando && !reporte) {
+    <div class="table-card glass-panel rs-card"><p class="estado-lista">Generando reporte...</p></div>
+  } @else if (reporte) {
+    <p class="periodo">
+      <strong>{{ reporte.colegio_nombre }}</strong> ·
+      {{ textoFecha(reporte.desde) }} al {{ textoFecha(reporte.hasta) }} ·
+      Puntual: hasta {{ reporte.tolerancia_atraso_minutos }} min de atraso (llegada en la ida, salida en la vuelta)
+    </p>
+
+    <div class="resumen">
+      <div><strong>{{ reporte.resumen.recorridos }}</strong><span>Recorridos</span></div>
+      <div><strong>{{ textoPuntualidad(reporte.resumen) }}</strong><span>Puntualidad</span></div>
+      <div><strong>{{ textoAtraso(reporte.resumen) }}</strong><span>Atraso promedio</span></div>
+      <div><strong>{{ reporte.resumen.viajes }}</strong><span>Viajes</span></div>
+      <div><strong>{{ reporte.resumen.no_subio }}</strong><span>No subieron</span></div>
+      <div><strong>{{ reporte.resumen.inasistencias }}</strong><span>Inasistencias avisadas</span></div>
+      <div><strong>{{ reporte.resumen.entregados }}</strong><span>Entregados</span></div>
+      <div><strong>{{ reporte.resumen.no_recibidos }}</strong><span>No se recibió</span></div>
+      <div [class.alerta]="reporte.resumen.emergencias > 0"><strong>{{ reporte.resumen.emergencias }}</strong><span>Emergencias</span></div>
+    </div>
+
+    @if (reporte.resumen.recorridos === 0) {
+      <div class="table-card glass-panel rs-card">
+        <p class="estado-lista">No hay recorridos terminados en este período.</p>
+      </div>
+    } @else {
+      <ng-template #tablaOperacion let-titulo="titulo" let-columna="columna" let-filas="filas">
+        <div class="table-card glass-panel rs-card">
+          <h3 class="titulo-tabla">{{ titulo }}</h3>
+          <div class="table-responsive rs-table-scroll">
+            <table class="custom-table rs-table rs-table--compact">
+              <thead>
+                <tr>
+                  <th>{{ columna }}</th>
+                  @if (variosColegios) {
+                    <th>Colegio</th>
+                  }
+                  <th>Recorridos</th>
+                  <th>Puntualidad</th>
+                  <th>Atraso promedio</th>
+                  <th>Viajes</th>
+                  <th>No subió</th>
+                  <th>Inasistencias</th>
+                  <th>No se recibió</th>
+                  <th>Emergencias</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (fila of filas; track $index) {
+                  <tr>
+                    <td class="font-bold">{{ fila.nombre }}</td>
+                    @if (variosColegios) {
+                      <td>{{ fila.colegio_nombre }}</td>
+                    }
+                    <td>{{ fila.recorridos }}</td>
+                    <td>{{ textoPuntualidad(fila) }}</td>
+                    <td>{{ textoAtraso(fila) }}</td>
+                    <td>{{ fila.viajes }}</td>
+                    <td>{{ fila.no_subio }}</td>
+                    <td>{{ fila.inasistencias }}</td>
+                    <td>{{ fila.no_recibidos }}</td>
+                    <td>{{ fila.emergencias }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </ng-template>
+
+      <ng-container [ngTemplateOutlet]="tablaOperacion" [ngTemplateOutletContext]="{ titulo: 'Por ruta', columna: 'Ruta', filas: reporte.por_ruta }"></ng-container>
+      <ng-container [ngTemplateOutlet]="tablaOperacion" [ngTemplateOutletContext]="{ titulo: 'Por conductor', columna: 'Conductor', filas: reporte.por_conductor }"></ng-container>
+
+      <div class="table-card glass-panel rs-card">
+        <h3 class="titulo-tabla">Por estudiante</h3>
+        <div class="table-responsive rs-table-scroll">
+          <table class="custom-table rs-table rs-table--compact">
+            <thead>
+              <tr>
+                <th>Estudiante</th>
+                @if (variosColegios) {
+                  <th>Colegio</th>
+                }
+                <th>Recorridos</th>
+                <th>Viajó</th>
+                <th>De ellos, no recibidos</th>
+                <th>No subió</th>
+                <th>Faltó con aviso</th>
+                <th>Sin registro</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (fila of reporte.por_estudiante; track $index) {
+                <tr>
+                  <td class="font-bold">{{ fila.nombre }}</td>
+                  @if (variosColegios) {
+                    <td>{{ fila.colegio_nombre }}</td>
+                  }
+                  <td>{{ fila.recorridos }}</td>
+                  <td>{{ fila.viajes }}</td>
+                  <td>{{ fila.no_recibidos }}</td>
+                  <td>{{ fila.no_subio }}</td>
+                  <td>{{ fila.inasistencias }}</td>
+                  <td>{{ fila.sin_registro }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+  }
+</div>

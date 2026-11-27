@@ -1,0 +1,619 @@
+<ion-content [fullscreen]="true">
+
+  <div class="scanner-page-container">
+
+    <!-- =========================
+         ENCABEZADO
+    ========================== -->
+    <header class="header-section rs-page-header">
+
+      <div class="header-info">
+
+        <span class="section-label">CONDUCTOR</span>
+
+        <h1>Escanear QR</h1>
+
+      </div>
+
+      <div class="header-actions">
+
+        <ion-menu-toggle menu="main-menu">
+
+          <button class="menu-button rs-header-action" type="button" title="Abrir menú">
+
+            <ion-icon name="menu-outline"></ion-icon>
+
+          </button>
+
+        </ion-menu-toggle>
+
+      </div>
+
+    </header>
+
+
+    <!-- =========================
+         MODO ESCÁNER CÁMARA
+    ========================== -->
+    @if (!qrEscaneado && !cargandoConsultaEntrega) {
+
+      @if (modoValidacionInstitucional) {
+        <div class="loading-consulting-card">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          <h3>Validación institucional de abordaje</h3>
+          <p>Escanea el QR del inspector del colegio para validar la subida del estudiante.</p>
+        </div>
+      } @else if (modoEntregaDomicilio) {
+        <div class="loading-consulting-card">
+          <ion-icon name="person-outline"></ion-icon>
+          <h3>Entrega en el domicilio</h3>
+          <p>Escanea el QR del apoderado o de la persona autorizada que recibe al estudiante.</p>
+        </div>
+      } @else if (recepcionInstitucionalRequerida) {
+        <div class="loading-consulting-card">
+          <ion-icon name="school-outline"></ion-icon>
+          <h3>Recepción institucional pendiente</h3>
+          <p>Escanea el QR temporal del delegado o inspector de este colegio para entregar a los estudiantes a bordo y finalizar la ruta.</p>
+        </div>
+      }
+
+      <div class="viewfinder-card">
+
+        <div class="viewfinder-header">
+
+          <!-- Sin cámara no se muestra "activo": el conductor debe saber que no está escaneando. -->
+          <div class="badge-live" [class.sin-camara]="!!errorCamara">
+
+            <span class="dot-blinking"></span>
+
+            <span>{{ errorCamara ? 'CÁMARA NO DISPONIBLE' : 'ESCÁNER ACTIVO' }}</span>
+
+          </div>
+
+          <div class="camera-buttons">
+
+            <button type="button" class="flash-btn" title="Cambiar cámara" aria-label="Cambiar cámara" [disabled]="cargandoCamara" (click)="alternarCamara()">
+
+              <ion-icon name="camera-reverse-outline"></ion-icon>
+
+            </button>
+
+            <button type="button" class="flash-btn" title="Linterna" aria-label="Linterna" (click)="toggleFlash()">
+
+              <ion-icon [name]="flashEncendido ? 'flash-outline' : 'flash-off-outline'"></ion-icon>
+
+            </button>
+
+          </div>
+
+        </div>
+
+
+        <!-- Marco de la cámara -->
+        <div class="camera-frame">
+
+          @if (cargandoCamara) {
+
+            <div class="camera-loading">
+
+              <ion-spinner name="crescent"></ion-spinner>
+
+              <p>Abriendo cámara...</p>
+
+            </div>
+
+          }
+
+          <!-- Video Stream HTML5 -->
+          <!-- Sin cámara se oculta el video vacío (Android muestra un ▶ que parece un botón). -->
+          <video #videoElement playsinline autoplay muted class="video-preview" [hidden]="!!errorCamara"></video>
+
+          <!-- Laser Scan Beam Animation -->
+          @if (!errorCamara) {
+          <div class="scan-beam"></div>
+          }
+
+          <!-- Scanning Target Grid -->
+          <div class="scan-corners">
+
+            <span class="corner top-left"></span>
+            <span class="corner top-right"></span>
+            <span class="corner bottom-left"></span>
+            <span class="corner bottom-right"></span>
+
+          </div>
+
+          <div class="scan-hint">
+
+            <ion-icon name="qr-code-outline"></ion-icon>
+
+            <span>{{ recepcionInstitucionalRequerida ? 'Apunta la cámara al QR del delegado o inspector del colegio' : 'Apunta la cámara al código QR del Apoderado o Delegado' }}</span>
+
+          </div>
+
+        </div>
+
+
+        @if (errorCamara) {
+
+          <div class="camera-fallback-msg" role="alert">
+
+            <ion-icon name="alert-circle-outline"></ion-icon>
+
+            <p>{{ errorCamara }}</p>
+
+          </div>
+
+        }
+
+      </div>
+
+
+      <!-- INGRESO MANUAL -->
+      @if (mostrarHerramientasDesarrollo) {
+      <div class="manual-input-card">
+
+        <span class="manual-title">¿Tienes el código de texto?</span>
+
+        <div class="manual-row">
+
+          <input
+            type="text"
+            placeholder="Pegar código o JSON..."
+            [(ngModel)]="codigoManual"
+            (keyup.enter)="procesarManual()"
+            class="manual-input" />
+
+          <button type="button" class="manual-btn" (click)="procesarManual()">
+
+            Validar
+
+          </button>
+
+        </div>
+
+      </div>
+      }
+
+    }
+
+
+    <!-- =========================
+         INDICADOR CARGANDO CONSULTA
+    ========================== -->
+    @if (cargandoConsultaEntrega) {
+
+      <div class="loading-consulting-card">
+
+        <ion-spinner name="crescent" color="primary"></ion-spinner>
+
+        <h3>Verificando QR y Consultando Ruta...</h3>
+
+        <p>Identificando a la persona y obteniendo los estudiantes autorizados en la ruta activa.</p>
+
+      </div>
+
+    }
+
+
+    <!-- =========================
+         RESULTADO DEL ESCANEO / CONFIRMACIÓN
+    ========================== -->
+    @if (qrEscaneado && !cargandoConsultaEntrega && !confirmacionExitosa) {
+
+      <div class="result-card" [class.result-error]="!qrEsValido">
+
+        <!-- Banner de Validación -->
+        <div class="result-banner" [class.banner-error]="!qrEsValido">
+
+          <ion-icon [name]="qrEsValido ? 'checkmark-circle-outline' : 'alert-circle-outline'"></ion-icon>
+
+          <div>
+
+            <h2>{{ qrEsValido ? (validandoInstitucional ? 'VALIDACIÓN INSTITUCIONAL' : (entregaInstitucional ? 'RECEPCIÓN INSTITUCIONAL' : (modoEntregaMultiple ? 'RECEPCIÓN DE ESTUDIANTES' : 'QR VÁLIDO Y VERIFICADO'))) : 'CÓDIGO QR NO VÁLIDO' }}</h2>
+
+            <p>{{ qrEsValido ? (validandoInstitucional ? 'Revisa los datos y confirma el abordaje del estudiante' : (entregaInstitucional ? 'Confirma la recepción de todos los estudiantes a bordo' : (modoEntregaMultiple ? 'Selecciona los estudiantes a entregar a la persona' : 'Detalles del estudiante escaneado'))) : errorValidacion }}</p>
+
+          </div>
+
+        </div>
+
+
+        @if (qrEsValido) {
+
+          <!-- =========================
+               FLUJO A: ENTREGA MÚLTIPLE (APODERADO / DELEGADO)
+          ========================== -->
+          @if (modoEntregaMultiple) {
+
+            <div class="scanned-details multi-delivery-container">
+
+              <!-- Badge Persona -->
+              <div class="details-type-badge persona-badge">
+
+                <ion-icon name="person-outline"></ion-icon>
+
+                <span>{{ entregaInstitucional ? 'INSPECTOR INSTITUCIONAL' : (personaEntrega?.rol || 'APODERADO TITULAR') }}</span>
+
+              </div>
+
+
+              <!-- Header Persona -->
+              <div class="detail-row main-subject persona-header">
+
+                <div class="subject-avatar persona-avatar">
+
+                  👤
+
+                </div>
+
+                <div class="subject-text">
+
+                  <h3>{{ personaEntrega?.nombre || qrEscaneado.nombre }}</h3>
+
+                  <p>RUT Receptor: <strong>{{ personaEntrega?.rut || qrEscaneado.rut }}</strong></p>
+
+                </div>
+
+              </div>
+
+
+              <!-- Checklist de Estudiantes Autorizados -->
+              <div class="checklist-section">
+
+                <div class="checklist-header">
+
+                  <div class="checklist-title">
+
+                    <ion-icon name="people-outline"></ion-icon>
+
+                    <h4>{{ modoValidacionInstitucional ? 'Estudiante seleccionado' : (abordajeAutorizado ? 'Estudiantes que suben' : (entregaInstitucional ? 'Estudiantes que recibirá' : 'Estudiantes autorizados')) }}</h4>
+
+                    <span class="count-badge">{{ estudiantesEntrega.length }}</span>
+
+                  </div>
+
+                  @if (estudiantesEntrega.length > 0 && !entregaInstitucional) {
+
+                    <button type="button" class="select-all-btn" (click)="toggleTodosEstudiantes()">
+
+                      {{ todosSeleccionadosState ? 'Desmarcar todos' : 'Marcar todos' }}
+
+                    </button>
+
+                  }
+
+                </div>
+
+
+                @if (estudiantesEntrega.length === 0) {
+
+                  <div class="empty-students-msg">
+
+                    <ion-icon name="alert-circle-outline"></ion-icon>
+
+                    <p>No hay estudiantes asociados a esta persona que estén en la ruta activa actual.</p>
+
+                  </div>
+
+                } @else {
+
+                  <div class="student-checklist">
+
+                    @for (est of estudiantesEntrega; track est.id) {
+
+                      <div
+                        class="student-check-item"
+                        [class.checked]="est.seleccionado"
+                        (click)="toggleEstudianteEntrega(est.id)">
+
+                        <div class="checkbox-box">
+
+                          <ion-icon [name]="est.seleccionado ? 'checkbox-outline' : 'square-outline'"></ion-icon>
+
+                        </div>
+
+                        <div class="student-info">
+
+                          <div class="student-name-row">
+
+                            <strong>🎓 {{ est.nombre }}</strong>
+
+                            <span class="status-chip">{{ est.estado || 'EN_RUTA' }}</span>
+
+                          </div>
+
+                          <div class="student-sub-info">
+
+                            <span>RUT: {{ est.rut }}</span>
+
+                            @if (est.curso) {
+
+                              <span>· {{ est.curso }}</span>
+
+                            }
+
+                          </div>
+
+                        </div>
+
+                      </div>
+
+                    }
+
+                  </div>
+
+                }
+
+              </div>
+
+
+              <!-- Nota Opcional -->
+              @if (!modoValidacionInstitucional) {
+              <div class="note-input-container">
+
+                <label for="notaMulti">Observaciones o notas (Opcional):</label>
+
+                <input
+                  id="notaMulti"
+                  type="text"
+                  placeholder="Ej: Entregados a apoderado en parada..."
+                  [(ngModel)]="notaAdicional"
+                  class="note-field" />
+
+              </div>
+              }
+
+
+              <!-- Botón Confirmar Entrega Múltiple -->
+              <ion-button
+                expand="block"
+                class="confirm-button multi-confirm-btn"
+                [disabled]="totalSeleccionadosCount === 0 || finalizandoRuta || enviandoEntrega"
+                (click)="confirmarRecepcion()">
+
+                <ion-icon slot="start" name="checkmark-done-circle-outline"></ion-icon>
+
+                {{ modoValidacionInstitucional ? 'Confirmar abordaje institucional' : (abordajeAutorizado ? 'Confirmar subida (' + totalSeleccionadosCount + ')' : 'Confirmar Recepción (' + totalSeleccionadosCount + ' Estudiantes)') }}
+
+              </ion-button>
+
+            </div>
+
+          } @else {
+
+            <!-- =========================
+                 FLUJO B: ESTUDIANTE INDIVIDUAL (ABORDAJE)
+            ========================== -->
+            <div class="scanned-details">
+
+              <div class="details-type-badge">
+
+                <ion-icon name="school-outline"></ion-icon>
+
+                <span>ESTUDIANTE</span>
+
+              </div>
+
+
+              <div class="detail-row main-subject">
+
+                <div class="subject-avatar">
+
+                  🎓
+
+                </div>
+
+                <div class="subject-text">
+
+                  <h3>QR de estudiante firmado</h3>
+
+                  <p>Al confirmar se verifica que pertenezca a tu ruta y se registra su subida al furgón.</p>
+
+                </div>
+
+              </div>
+
+
+              <!-- Nota Opcional -->
+              <div class="note-input-container">
+
+                <label for="notaSingle">Observaciones o notas (Opcional):</label>
+
+                <input
+                  id="notaSingle"
+                  type="text"
+                  placeholder="Ej: Recibido sin novedades..."
+                  [(ngModel)]="notaAdicional"
+                  class="note-field" />
+
+              </div>
+
+
+              <!-- Botón Confirmar -->
+              <ion-button
+                expand="block"
+                class="confirm-button"
+                (click)="confirmarRecepcion()">
+
+                <ion-icon slot="start" name="checkmark-done-circle-outline"></ion-icon>
+
+                Confirmar subida al furgón
+
+              </ion-button>
+
+            </div>
+
+          }
+
+        }
+
+
+        <!-- Botón Reintentar o Escanear Otro -->
+        <ion-button
+          fill="outline"
+          class="reset-button"
+          (click)="resetearEscaneo()">
+
+          <ion-icon slot="start" name="refresh-outline"></ion-icon>
+
+          Volver a Escanear
+
+        </ion-button>
+
+      </div>
+
+    }
+
+
+    <!-- =========================
+         CONFIRMACIÓN EXITOSA
+    ========================== -->
+    @if (confirmacionExitosa) {
+
+      <div class="success-screen">
+
+        <div class="success-icon-wrapper">
+
+          <ion-icon name="checkmark-circle-outline"></ion-icon>
+
+        </div>
+
+        <h2>¡Registro Confirmado!</h2>
+
+        <p class="success-subtitle">
+
+          El estado de los estudiantes seleccionados ha sido actualizado en la ruta activa.
+
+        </p>
+
+
+        <div class="success-summary-card">
+
+          <div class="summary-line">
+
+            <span>Acción:</span>
+
+            <strong>{{ validandoInstitucional ? 'Abordaje con validación institucional' : (modoEntregaMultiple ? 'Entrega Múltiple a Receptor' : 'Abordaje al Furgón') }}</strong>
+
+          </div>
+
+          @if (modoEntregaMultiple) {
+
+            <div class="summary-line">
+
+              <span>Receptor:</span>
+
+              <strong>{{ personaEntrega?.nombre || qrEscaneado?.nombre }}</strong>
+
+            </div>
+
+            <div class="summary-line">
+
+              <span>Estudiantes Entregados:</span>
+
+              <strong>{{ totalSeleccionadosCount }} estudiante(s)</strong>
+
+            </div>
+
+          } @else {
+
+            <div class="summary-line">
+
+              <span>Nombre:</span>
+
+              <strong>{{ estudianteConfirmado || qrEscaneado?.nombre_estudiante || qrEscaneado?.nombre }}</strong>
+
+            </div>
+
+          }
+
+          <div class="summary-line">
+
+            <span>Fecha y Hora:</span>
+
+            <strong>{{ fechaConfirmacion | date:'dd/MM/yyyy HH:mm' }}</strong>
+
+          </div>
+
+          @if (notaAdicional) {
+
+            <div class="summary-line">
+
+              <span>Nota:</span>
+
+              <em>"{{ notaAdicional }}"</em>
+
+            </div>
+
+          }
+
+        </div>
+
+
+        <div class="success-actions">
+
+          <ion-button
+            expand="block"
+            class="action-btn primary"
+            (click)="resetearEscaneo()">
+
+            <ion-icon slot="start" name="qr-code-outline"></ion-icon>
+
+            Escanear Otro Código
+
+          </ion-button>
+
+          <ion-button
+            fill="outline"
+            class="action-btn secondary"
+            (click)="volverARuta()">
+
+            <ion-icon slot="start" name="arrow-back-outline"></ion-icon>
+
+            Volver a la Ruta Activa
+
+          </ion-button>
+
+        </div>
+
+      </div>
+
+    }
+
+
+    <!-- =========================
+         FOOTER
+    ========================== -->
+    <footer class="footer-message">
+
+      <span>🚌</span>
+
+      <p>Tu ruta escolar, más segura.</p>
+
+    </footer>
+
+  </div>
+
+  <!-- Confirmación: ¿seguro que son estos niños? -->
+  @if (confirmandoSeleccion) {
+    <app-confirmar-ninos
+      [seleccionados]="estudiantesSeleccionados"
+      [noSeleccionados]="estudiantesNoSeleccionados"
+      [persona]="personaEntrega?.nombre || qrEscaneado?.nombre || ''"
+      [esSubida]="abordajeAutorizado"
+      (revisar)="revisarSeleccion()"
+      (confirmar)="aceptarSeleccion()">
+    </app-confirmar-ninos>
+  }
+
+  <ion-toast
+    [isOpen]="mostrarToast"
+    [message]="mensajeToast"
+    [duration]="2500"
+    [color]="colorToast"
+    (didDismiss)="mostrarToast = false">
+
+  </ion-toast>
+
+</ion-content>

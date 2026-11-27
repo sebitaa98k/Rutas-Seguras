@@ -1,0 +1,409 @@
+:host {
+  --verde-claro: var(--rs-color-primary-soft);
+  --texto: var(--rs-color-text);
+}
+
+
+/* =================================
+   PÁGINA
+================================= */
+
+.login-page {
+  height: 100%;
+  box-sizing: border-box;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  background: var(--verde-petroleo);
+
+  overflow: hidden;
+
+  padding: env(safe-area-inset-top) 0 0;
+}
+
+
+/* =================================
+   BOTÓN VOLVER
+================================= */
+
+.back-button {
+  position: absolute;
+
+  top: calc(16px + env(safe-area-inset-top));
+  left: 18px;
+
+  width: 44px;
+  height: 44px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0;
+  padding: 0;
+
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+
+  background: rgba(255, 255, 255, 0.14);
+
+  color: #ffffff;
+
+  z-index: 10;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.15s ease;
+}
+
+.back-button ion-icon {
+  width: 22px;
+  height: 22px;
+
+  font-size: 22px;
+
+  color: #ffffff;
+
+  --ionicon-stroke-width: 42px;
+}
+
+.back-button:active {
+  background: rgba(255, 255, 255, 0.22);
+
+  transform: scale(0.94);
+}
+
+/* =================================
+   HERO
+================================= */
+
+.hero-section {
+  width: 100%;
+
+  text-align: center;
+
+  flex: 0 1 auto;
+  min-height: 0;
+
+  padding: 20px 24px 14px;
+
+  color: white;
+}
+
+
+/* BUS */
+
+.bus-image {
+  display: block;
+
+  width: auto;
+  max-width: min(80%, 240px);
+
+  height: auto;
+  max-height: 20vh;
+
+  margin: 0 auto 4px;
+
+  object-fit: contain;
+}
+
+
+/* TITULO */
+
+.hero-section h1 {
+  margin: 0;
+
+  font-size: 26px;
+  line-height: 1.15;
+
+  font-weight: 800;
+
+  color: var(--amarillo-escolar);
+
+  letter-spacing: -0.5px;
+}
+
+
+/* SUBTITULO */
+
+.hero-section p {
+  margin: 6px 0 0;
+
+  font-size: 9px;
+  font-weight: 500;
+
+  letter-spacing: 0.5px;
+
+  color: rgba(255, 255, 255, 0.9);
+}
+
+
+/* =================================
+   TARJETA LOGIN
+================================= */
+
+.login-card {
+  position: relative;
+
+  width: 100%;
+
+  box-sizing: border-box;
+  min-height: 0;
+
+  padding: 18px var(--rs-space-8) 12px;
+
+  background: var(--blanco);
+
+  border-radius: var(--rs-radius-xl) var(--rs-radius-xl) 0 0;
+
+  box-shadow:
+    0 -5px 20px rgba(0, 0, 0, 0.05);
+
+  flex: 1;
+}
+
+
+/* =================================
+   CAMPOS
+================================= */
+
+.input-wrapper {
+  margin-bottom: 12px;
+}
+
+ion-item {
+  --background: transparent;
+
+  --padding-start: 8px;
+  --padding-end: 8px;
+
+  --inner-padding-end: 0;
+
+  --min-height: 48px;
+
+  height: 48px;
+
+  border: 1px solid var(--rs-color-border);
+
+  border-radius: var(--rs-input-radius);
+
+  color: var(--verde-petroleo);
+}
+
+
+/* ICONOS */
+
+ion-icon {
+  color: var(--verde-petroleo);
+
+  font-size: 17px;
+
+  margin-right: 4px;
+}
+
+
+/* INPUT */
+
+ion-input {
+  --color: var(--texto);
+  --placeholder-color: var(--rs-color-text-soft);
+
+  --highlight-color-focused: var(--verde-petroleo);
+
+  font-size: 13px;
+}
+
+
+/* =================================
+   RECUPERAR CONTRASEÑA
+================================= */
+
+.forgot-password {
+  text-align: center;
+
+  margin: 8px 0 6px;
+}
+
+.forgot-password a {
+  color: var(--rs-color-text-muted);
+
+  font-size: 10px;
+
+  line-height: 1.25;
+
+  text-decoration: none;
+}
+
+
+/* =================================
+   ERROR
+================================= */
+
+.error-message {
+  margin: 10px 0;
+
+  padding: 10px 12px;
+
+  background: var(--rs-color-danger-soft);
+
+  border: 1px solid var(--rs-color-danger);
+
+  border-radius: 12px;
+
+  color: var(--rs-color-danger);
+
+  font-size: 12px;
+
+  text-align: center;
+}
+
+
+/* =================================
+   LOGIN
+================================= */
+
+.login-button {
+  --background: var(--verde-petroleo);
+
+  --background-hover: var(--verde-petroleo-oscuro);
+
+  --background-activated: var(--verde-petroleo-oscuro);
+
+  --color: white;
+
+  --border-radius: 25px;
+
+  --box-shadow:
+    0 5px 12px rgba(63, 125, 115, 0.22);
+
+  height: 45px;
+
+  margin: 4px 0 0;
+
+  font-size: 13px;
+
+  font-weight: 500;
+
+  text-transform: none;
+}
+
+
+/* =================================
+   SEPARADOR
+================================= */
+
+.separator {
+  text-align: center;
+
+  margin: 4px 0;
+
+  font-size: 10px;
+
+  color: var(--verde-petroleo);
+}
+
+
+/* =================================
+   CREAR CUENTA
+================================= */
+
+.register-button {
+  --background: var(--rs-color-primary-soft);
+
+  --background-hover: var(--rs-color-primary-subtle);
+
+  --background-activated: var(--rs-color-primary-subtle);
+
+  --color: var(--rs-color-primary-hover);
+
+  --border-radius: 25px;
+
+  --box-shadow:
+    0 5px 12px rgba(0, 0, 0, 0.08);
+
+  height: 45px;
+
+  margin: 4px 0 0;
+
+  font-size: 13px;
+
+  font-weight: 500;
+
+  text-transform: none;
+}
+
+
+/* =================================
+   ROL CONDUCTOR
+================================= */
+
+.role-label {
+  margin: 10px 0 0;
+
+  padding: 7px 14px;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  font-size: 9px;
+
+  text-align: center;
+}
+
+
+/* =================================
+   RESPONSIVE
+================================= */
+
+@media (max-height: 700px) {
+
+  .hero-section {
+    padding-top: 12px;
+    padding-bottom: 8px;
+  }
+
+  .bus-image {
+    max-height: 14vh;
+  }
+
+  .hero-section h1 {
+    font-size: 22px;
+  }
+
+  .login-card {
+    padding-top: 12px;
+  }
+
+  .input-wrapper {
+    margin-bottom: 9px;
+  }
+
+}
+
+/* Demo: botón "Servidor" (solo si mobile-app/.env lo habilita) */
+.server-button {
+  position: absolute;
+  top: calc(16px + env(safe-area-inset-top));
+  right: 18px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  z-index: 10;
+  cursor: pointer;
+}
+
+.server-button ion-icon {
+  margin: 0;
+  font-size: 20px;
+  color: #ffffff;
+}

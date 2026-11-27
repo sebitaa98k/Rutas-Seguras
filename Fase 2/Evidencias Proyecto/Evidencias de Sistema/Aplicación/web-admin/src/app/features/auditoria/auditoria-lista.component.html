@@ -1,0 +1,381 @@
+<div class="list-page fade-in">
+  <div class="list-header">
+    <div>
+      <h2>Auditoría</h2>
+      <p>Historial de cada ruta y constancia de aceptación de los términos.</p>
+    </div>
+  </div>
+
+  <div class="pestanas" role="tablist">
+    <button type="button" role="tab" [class.activa]="vista === 'recorridos'" [attr.aria-selected]="vista === 'recorridos'" (click)="cambiarVista('recorridos')">Recorridos</button>
+    <button type="button" role="tab" [class.activa]="vista === 'terminos'" [attr.aria-selected]="vista === 'terminos'" (click)="cambiarVista('terminos')">Términos</button>
+  </div>
+
+  @if (vista === 'terminos') {
+    <form class="filtros glass-panel rs-card" (ngSubmit)="cargarTerminos()">
+      <label class="buscar">
+        Buscar
+        <input type="search" name="buscarTerminos" placeholder="Nombre, RUT o correo" [(ngModel)]="buscarTerminos" />
+      </label>
+      <button type="submit" class="btn-primary rs-btn rs-btn--primary">Filtrar</button>
+    </form>
+
+    @if (cargandoTerminos) {
+      <div class="table-card glass-panel rs-card"><p class="estado-lista">Cargando...</p></div>
+    } @else if (errorTerminos) {
+      <div class="table-card glass-panel rs-card"><p class="estado-lista error" role="alert">{{ errorTerminos }}</p></div>
+    } @else {
+      <div class="resumen">
+        <div><strong>{{ aceptaciones.length }}</strong><span>Aceptaciones</span></div>
+        <div [class.alerta]="pendientes.length > 0"><strong>{{ pendientes.length }}</strong><span>Pendientes</span></div>
+        <div><strong>{{ versionTerminos }}</strong><span>Versión vigente</span></div>
+      </div>
+
+      <div class="table-card glass-panel rs-card">
+        <h3 class="titulo-tabla">Aceptaciones</h3>
+        @if (aceptaciones.length === 0) {
+          <p class="estado-lista">Todavía no hay aceptaciones registradas.</p>
+        } @else {
+          <div class="table-responsive rs-table-scroll">
+            <table class="custom-table rs-table rs-table--compact">
+              <thead>
+                <tr>
+                  <th>Fecha y hora</th>
+                  <th>Apoderado</th>
+                  <th>RUT</th>
+                  <th>Hijos y colegio</th>
+                  <th>Versión</th>
+                  <th>Origen</th>
+                  <th>Conexión</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of aceptaciones; track item.id) {
+                  <tr>
+                    <td>{{ item.aceptado_en | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+                    <td class="font-bold">{{ item.nombre }}<br /><small>{{ item.email }}</small></td>
+                    <td>{{ item.rut || '—' }}</td>
+                    <td class="hijos-col">
+                      @for (hijo of item.hijos || []; track $index) {
+                        <span class="hijo-linea">
+                          <strong>{{ hijo.nombre }}</strong> · {{ hijo.colegio_nombre || '—' }}
+                          <!-- El estado de biometría es el de hoy: solo se muestra en la aceptación vigente. -->
+                          @if (item.version === versionTerminos) {
+                          <span
+                            class="biometria-pill"
+                            [class.biometria-pill--si]="hijo.autoriza_biometria"
+                            [title]="hijo.autoriza_biometria_en ? ('Desde ' + (hijo.autoriza_biometria_en | date:'dd/MM/yyyy HH:mm')) : ''"
+                          >{{ hijo.autoriza_biometria ? 'Biometría autorizada' : 'Solo QR' }}</span>
+                          }
+                        </span>
+                      } @empty {
+                        <span class="hijo-linea texto-suave">Sin hijos inscritos · {{ item.colegio_nombre || '—' }}</span>
+                      }
+                      @if (item.hijos_otros_colegios) {
+                        <span class="hijo-linea texto-suave">
+                          + {{ item.hijos_otros_colegios }} {{ item.hijos_otros_colegios === 1 ? 'hijo' : 'hijos' }} en otro colegio
+                        </span>
+                      }
+                    </td>
+                    <td>
+                      {{ item.version }}
+                      @if (item.version !== versionTerminos) {
+                        <br /><small class="texto-suave">Versión anterior</small>
+                      }
+                    </td>
+                    <td>{{ item.origen_nombre }}</td>
+                    <td [title]="item.dispositivo">{{ item.ip || '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+
+      <div class="table-card glass-panel rs-card">
+        <h3 class="titulo-tabla">Consentimientos de biometría por estudiante</h3>
+        <p class="nota-tabla">Constancias que no se pueden editar ni borrar: se conservan aunque se eliminen la foto y los datos faciales del estudiante.</p>
+        @if (consentimientosBiometria.length === 0) {
+          <p class="estado-lista">Todavía no hay consentimientos registrados.</p>
+        } @else {
+          <div class="table-responsive rs-table-scroll">
+            <table class="custom-table rs-table rs-table--compact">
+              <thead>
+                <tr>
+                  <th>Fecha y hora</th>
+                  <th>Estudiante</th>
+                  <th>Apoderado</th>
+                  <th>Colegio</th>
+                  <th>Decisión</th>
+                  <th>Dónde</th>
+                  <th>Términos</th>
+                  <th>Conexión</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of consentimientosBiometria; track item.id) {
+                  <tr>
+                    <td>{{ item.creado_en | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+                    <td class="font-bold">{{ item.estudiante_nombre }}<br /><small>{{ item.estudiante_rut || '—' }}</small></td>
+                    <td>{{ item.apoderado_nombre || '—' }}<br /><small>{{ item.apoderado_rut || item.apoderado_email }}</small></td>
+                    <td>{{ item.colegio_nombre || '—' }}</td>
+                    <td>
+                      <span class="biometria-pill" [class.biometria-pill--si]="item.evento === 'otorgado'">{{ item.evento_nombre }}</span>
+                      @if (item.datos_eliminados) {
+                        <br /><small>Se borraron su foto y sus datos faciales</small>
+                      }
+                    </td>
+                    <td>{{ item.origen_nombre }}</td>
+                    <td>{{ item.version_terminos || '—' }}</td>
+                    <td [title]="item.dispositivo">{{ item.ip || '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+
+      <div class="table-card glass-panel rs-card">
+        <h3 class="titulo-tabla">Historial anterior (autorización general, términos 1.0 y 1.1)</h3>
+        @if (cambiosBiometria.length === 0) {
+          <p class="estado-lista">No hay registros del sistema anterior.</p>
+        } @else {
+          <div class="table-responsive rs-table-scroll">
+            <table class="custom-table rs-table rs-table--compact">
+              <thead>
+                <tr>
+                  <th>Fecha y hora</th>
+                  <th>Apoderado</th>
+                  <th>RUT</th>
+                  <th>Colegio</th>
+                  <th>Cambio</th>
+                  <th>Dónde</th>
+                  <th>Conexión</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of cambiosBiometria; track item.id) {
+                  <tr>
+                    <td>{{ item.creado_en | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+                    <td class="font-bold">{{ item.nombre }}<br /><small>{{ item.email }}</small></td>
+                    <td>{{ item.rut || '—' }}</td>
+                    <td>{{ item.colegio_nombre || '—' }}</td>
+                    <td>
+                      {{ item.autoriza ? 'Autorizó' : 'Retiró la autorización' }}
+                      @if (!item.autoriza && item.fotos_eliminadas) {
+                        <br /><small>{{ item.fotos_eliminadas }} foto(s) eliminada(s)</small>
+                      }
+                    </td>
+                    <td>{{ item.origen_nombre }}</td>
+                    <td [title]="item.dispositivo">{{ item.ip || '—' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+
+      <div class="table-card glass-panel rs-card">
+        <h3 class="titulo-tabla">Pendientes de aceptar</h3>
+        @if (pendientes.length === 0) {
+          <p class="estado-lista">No hay apoderados pendientes.</p>
+        } @else {
+          <div class="table-responsive rs-table-scroll">
+            <table class="custom-table rs-table rs-table--compact">
+              <thead>
+                <tr>
+                  <th>Apoderado</th>
+                  <th>RUT</th>
+                  <th>Colegio</th>
+                  <th>Situación</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of pendientes; track item.id) {
+                  <tr>
+                    <td class="font-bold">{{ item.nombre }}<br /><small>{{ item.email }}</small></td>
+                    <td>{{ item.rut || '—' }}</td>
+                    <td>{{ item.colegio_nombre || '—' }}</td>
+                    <td>{{ item.debe_cambiar_password ? 'Aún no cambia su contraseña inicial' : 'Falta aceptar los términos' }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </div>
+
+      @if (aceptaciones.length >= limiteTerminos || pendientes.length >= limiteTerminos) {
+        <p class="estado-lista">Se muestran los {{ limiteTerminos }} más recientes. Usa la búsqueda para encontrar otros.</p>
+      }
+    }
+  } @else {
+
+  <form class="filtros glass-panel rs-card" (ngSubmit)="cargar()">
+    <label>
+      Desde
+      <input type="date" name="desde" [(ngModel)]="filtros.desde" />
+    </label>
+    <label>
+      Hasta
+      <input type="date" name="hasta" [(ngModel)]="filtros.hasta" />
+    </label>
+    <label class="buscar">
+      Buscar
+      <input type="search" name="buscar" placeholder="Ruta, conductor, alumno o quien recibió" [(ngModel)]="filtros.buscar" />
+    </label>
+    <label class="check">
+      <input type="checkbox" name="soloAtrasos" [(ngModel)]="filtros.soloAtrasos" />
+      Solo con atraso
+    </label>
+    <button type="submit" class="btn-primary rs-btn rs-btn--primary">Filtrar</button>
+    <button type="button" class="btn-limpiar rs-btn rs-btn--secondary" (click)="limpiar()">Limpiar</button>
+  </form>
+
+  @if (!cargando && !error && recorridos.length > 0) {
+    <div class="resumen">
+      <div><strong>{{ recorridos.length }}</strong><span>Recorridos</span></div>
+      <div [class.alerta]="cantidadAtrasados > 0"><strong>{{ cantidadAtrasados }}</strong><span>Con atraso</span></div>
+      <div [class.alerta]="cantidadFaltas > 0"><strong>{{ cantidadFaltas }}</strong><span>Alumnos que no subieron</span></div>
+      <div [class.alerta]="cantidadEmergencias > 0"><strong>{{ cantidadEmergencias }}</strong><span>Emergencias</span></div>
+    </div>
+  }
+
+  <div class="table-card glass-panel rs-card">
+    @if (cargando) {
+      <p class="estado-lista">Cargando...</p>
+    } @else if (error) {
+      <p class="estado-lista error" role="alert">{{ error }}</p>
+    } @else if (recorridos.length === 0) {
+      <p class="estado-lista">No hay recorridos registrados con estos filtros.</p>
+    } @else {
+      <div class="table-responsive rs-table-scroll">
+        <table class="custom-table rs-table rs-table--compact">
+          <thead>
+            <tr>
+              <th class="expand-col"></th>
+              <th>Inicio</th>
+              <th>Término</th>
+              <th>Ruta</th>
+              <th>Sentido</th>
+              @if (variosColegios) {
+                <th>Colegio</th>
+              }
+              <th>Conductor</th>
+              <th>Furgón</th>
+              <th>Alumnos</th>
+              <th>Puntualidad</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (recorrido of recorridos; track recorrido.id) {
+              <tr class="clickable-row" (click)="alternar(recorrido.id)">
+                <td class="expand-col">
+                  <span class="chevron" [class.open]="abiertos.has(recorrido.id)">▶</span>
+                </td>
+                <td>{{ recorrido.iniciado_en ? (recorrido.iniciado_en | date:'dd/MM/yyyy HH:mm') : 'Sin iniciar' }}</td>
+                <td>{{ recorrido.finalizado_en ? (recorrido.finalizado_en | date:'HH:mm') : '—' }}</td>
+                <td class="font-bold">
+                  {{ recorrido.nombre_ruta }}
+                  @if (recorrido.simulado) {
+                    <span class="etiqueta neutra">Simulado</span>
+                  }
+                </td>
+                <td>{{ textoSentido(recorrido) }}</td>
+                @if (variosColegios) {
+                  <td>{{ recorrido.colegio_nombre }}</td>
+                }
+                <td>{{ recorrido.conductor_nombre || 'Sin conductor' }}</td>
+                <td>{{ recorrido.furgon_patente || '—' }}</td>
+                <td>{{ recorrido.alumnos.length }}</td>
+                <td>
+                  <span class="etiqueta" [class.alerta]="recorrido.atrasado" [class.neutra]="recorrido.minutos_atraso === null">{{ textoAtraso(recorrido) }}</span>
+                </td>
+                <td>{{ textoEstado(recorrido) }}</td>
+              </tr>
+
+              @if (abiertos.has(recorrido.id)) {
+                <tr class="expanded-row">
+                  <td [attr.colspan]="variosColegios ? 11 : 10">
+                    <div class="detalle">
+                      @if (recorrido.hora_programada) {
+                        <p class="programada">{{ recorrido.sentido === 'hacia_colegio' ? 'Llegada' : 'Salida' }} programada: {{ recorrido.hora_programada.slice(0, 5) }} (tolerancia de {{ tolerancia }} min).</p>
+                      }
+
+                      <h4>Alumnos del recorrido</h4>
+                      <div class="rs-table-scroll">
+                        <table class="sub-table">
+                          <thead>
+                            <tr>
+                              <th>Alumno</th>
+                              <th>Estado</th>
+                              <th>Subió</th>
+                              <th>Validó la subida</th>
+                              <th>Entregó</th>
+                              <th>Recibió</th>
+                              <th>Observaciones</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (alumno of recorrido.alumnos; track alumno.nombre) {
+                              <tr>
+                                <td><strong>{{ alumno.nombre }}</strong></td>
+                                <td>{{ alumno.estado_nombre }}</td>
+                                <td>{{ alumno.subida ? (alumno.subida.creado_en | date:'HH:mm') : '—' }}</td>
+                                <td>
+                                  @if (alumno.subida) {
+                                    {{ alumno.subida.metodo }}
+                                    @if (alumno.subida.persona_nombre) {
+                                      <br />{{ textoPersona(alumno.subida) }}
+                                    }
+                                  } @else {
+                                    —
+                                  }
+                                </td>
+                                <td>{{ alumno.entrega ? (recorrido.conductor_nombre || '—') : '—' }}</td>
+                                <td>
+                                  @if (alumno.entrega) {
+                                    {{ textoPersona(alumno.entrega) }}
+                                    <br />{{ alumno.entrega.metodo }} a las {{ alumno.entrega.creado_en | date:'HH:mm' }}
+                                  } @else {
+                                    —
+                                  }
+                                </td>
+                                <td>{{ alumno.observaciones.join(' ') || '—' }}</td>
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+
+                      <h4>Movimientos</h4>
+                      <ol class="movimientos">
+                        @for (evento of recorrido.eventos; track evento.id) {
+                          <li [class.alerta]="evento.tipo === 'emergencia' || evento.tipo === 'ausente' || evento.tipo === 'no_recibido'">
+                            <time>{{ evento.creado_en | date:'dd/MM HH:mm:ss' }}</time>
+                            <strong>{{ evento.tipo_nombre }}</strong>
+                            <span>{{ textoEvento(evento) }}</span>
+                          </li>
+                        } @empty {
+                          <li>Sin movimientos registrados.</li>
+                        }
+                      </ol>
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+      @if (recorridos.length >= limite) {
+        <p class="estado-lista">Se muestran los {{ limite }} recorridos más recientes. Usa las fechas para ver otros.</p>
+      }
+    }
+  </div>
+  }
+</div>

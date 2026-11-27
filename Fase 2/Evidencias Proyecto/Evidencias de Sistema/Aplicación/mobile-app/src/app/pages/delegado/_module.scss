@@ -1,0 +1,219 @@
+/* Fase 4C: capa visual compartida del módulo Delegado. */
+:host {
+  --brand: var(--rs-color-primary);
+  --brand-dark: var(--rs-color-primary-hover);
+  --verde-petroleo: var(--rs-color-primary);
+  --verde-petroleo-oscuro: var(--rs-color-primary-hover);
+  --amarillo-escolar: var(--rs-color-accent);
+  --ink: var(--rs-color-text);
+  --muted: var(--rs-color-text-muted);
+  --surface: var(--rs-color-surface);
+  --line: var(--rs-color-border);
+}
+
+.page-container,
+.seguimiento-page,
+.qr-page,
+.perfil-page,
+.registro-page {
+  color: var(--rs-color-text);
+  background: var(--rs-color-background);
+}
+
+.badge-role,
+.badge-tag,
+.hero-badge,
+.eyebrow {
+  color: var(--rs-color-primary);
+  font-size: var(--rs-font-size-xs);
+  font-weight: var(--rs-font-weight-bold);
+  letter-spacing: 0.08em;
+}
+
+.summary-card,
+.quick-action,
+.filters-panel,
+.student-card,
+.empty-card,
+.map-container,
+.details-card,
+.status-box,
+.driver-card,
+.qr-card,
+.profile-card,
+.field-box,
+.registro-card {
+  border: 1px solid var(--rs-color-border) !important;
+  border-radius: var(--rs-card-radius) !important;
+  background: var(--rs-color-surface) !important;
+  box-shadow: var(--rs-shadow-card) !important;
+}
+
+.summary-card,
+.quick-action,
+.filters-panel,
+.student-card,
+.empty-card,
+.details-card,
+.status-box,
+.driver-card,
+.qr-card,
+.profile-card,
+.field-box {
+  padding: var(--rs-card-padding) !important;
+}
+
+.summary-card.primary {
+  border-color: var(--rs-color-primary) !important;
+  background: var(--rs-color-primary) !important;
+  color: var(--rs-color-surface) !important;
+}
+
+.quick-icon,
+.student-avatar,
+.status-icon,
+.user-avatar,
+.avatar-box {
+  background: var(--rs-color-primary-soft) !important;
+  color: var(--rs-color-primary) !important;
+}
+
+.count-badge,
+.transport-tag,
+.live-pill,
+.timer-box,
+.verified-badge,
+.lock-tag {
+  border-radius: var(--rs-radius-pill) !important;
+}
+
+.transport-tag,
+.verified-badge,
+.lock-tag,
+.timer-box:not(.expired) {
+  background: var(--rs-color-success-soft) !important;
+  color: var(--rs-color-success) !important;
+}
+
+.transport-tag.pending,
+.timer-box.expired {
+  background: var(--rs-color-warning-soft) !important;
+  color: var(--rs-color-warning) !important;
+}
+
+.search-box input,
+.course-filter select,
+.field-box.editable input {
+  min-height: var(--rs-control-height);
+  border: 1px solid var(--rs-color-border) !important;
+  border-radius: var(--rs-input-radius) !important;
+  background: var(--rs-color-surface) !important;
+  color: var(--rs-color-text) !important;
+}
+
+.search-box input:focus,
+.course-filter select:focus,
+.field-box.editable input:focus {
+  border-color: var(--rs-color-primary) !important;
+  outline: none;
+  box-shadow: var(--rs-focus-ring) !important;
+}
+
+.contact-button,
+.qr-button,
+.text-button,
+.refresh-btn,
+.call-btn,
+.edit-toggle-btn {
+  min-height: 44px;
+  border-radius: var(--rs-button-radius) !important;
+}
+
+.qr-button,
+.refresh-button,
+.save-btn,
+.submit-button {
+  --background: var(--rs-color-primary);
+  --background-hover: var(--rs-color-primary-hover);
+  --background-activated: var(--rs-color-primary-hover);
+  --color: var(--rs-color-surface);
+  border-radius: var(--rs-button-radius) !important;
+}
+
+.loading-box,
+.center-box,
+.map-empty,
+.empty-card,
+.error-card {
+  color: var(--rs-color-text-muted);
+}
+
+.loading-box,
+.center-box {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rs-space-3);
+  text-align: center;
+}
+
+.error-card,
+.center-box.error-box {
+  border-color: var(--rs-color-danger) !important;
+  background: var(--rs-color-danger-soft) !important;
+  color: var(--rs-color-danger) !important;
+}
+
+.map-container,
+.qr-code-box {
+  overflow: hidden;
+  border: 1px solid var(--rs-color-border) !important;
+  border-radius: var(--rs-card-radius) !important;
+  box-shadow: var(--rs-shadow-card) !important;
+}
+
+.student-header,
+.student-meta,
+.card-actions,
+.card-title-row,
+.field-content,
+.user-badge {
+  min-width: 0;
+}
+
+.student-names h3,
+.status-info h2,
+.driver-info strong,
+.user-details h2,
+.field-value {
+  color: var(--rs-color-text) !important;
+}
+
+.assignment-text,
+.student-meta span,
+.driver-info .label,
+.info-footer,
+.field-label {
+  color: var(--rs-color-text-muted) !important;
+}
+
+@media (max-width: 360px) {
+  .summary-card,
+  .quick-action,
+  .student-card,
+  .details-card,
+  .driver-card,
+  .qr-card,
+  .profile-card {
+    padding: var(--rs-space-3) !important;
+  }
+
+  .student-meta,
+  .card-actions,
+  .quick-actions {
+    flex-wrap: wrap;
+    gap: var(--rs-space-2);
+  }
+}

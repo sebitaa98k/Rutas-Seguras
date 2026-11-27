@@ -1,0 +1,227 @@
+.page-container {
+  padding: 1.5rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 4px 0;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin: 0;
+  }
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+
+  &.alert-danger {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+}
+
+.form-card {
+  padding: 1.75rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+
+  .full-width {
+    grid-column: span 2;
+  }
+}
+
+.quien-recibe {
+  padding: 1rem 1.25rem;
+
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+
+  background: #f8fafc;
+
+  h3 {
+    margin: 0 0 0.75rem;
+
+    font-size: 0.95rem;
+    color: #0f172a;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: minmax(150px, auto) 1fr;
+    gap: 0.5rem 1rem;
+
+    margin: 0;
+  }
+
+  dt {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+  }
+
+  dd {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    margin: 0;
+
+    font-size: 0.875rem;
+    color: #0f172a;
+  }
+
+  p {
+    margin: 0.75rem 0 0;
+
+    font-size: 0.8rem;
+    color: #64748b;
+  }
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+  }
+
+  input, select {
+    padding: 0.65rem 0.85rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+
+    &:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    &.invalid {
+      border-color: #ef4444;
+    }
+  }
+
+  .error-text {
+    font-size: 0.8rem;
+    color: #ef4444;
+  }
+}
+
+.form-actions {
+  margin-top: 1.75rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.btn {
+  padding: 0.65rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+
+  &.btn-primary {
+    background: var(--rs-primary);
+    color: white;
+    border: none;
+
+    &:hover:not(:disabled) {
+      background: var(--rs-primary-hover);
+    }
+
+  }
+
+  &.btn-secondary {
+    background: #f1f5f9;
+    color: #475569;
+    border: 1px solid #cbd5e1;
+
+    &:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+  }
+}
+
+// Ventana "¿Es el apoderado correcto?"
+.confirmar-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+
+  background: rgba(15, 23, 42, 0.45);
+}
+
+.confirmar-card {
+  width: 100%;
+  max-width: 460px;
+  padding: 24px;
+  border-radius: 14px;
+
+  background: #ffffff;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25);
+
+  h3 {
+    margin: 0 0 6px;
+    font-size: 18px;
+  }
+}
+
+.confirmar-ayuda {
+  margin: 0 0 14px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.confirmar-datos {
+  margin: 0 0 18px;
+
+  dt {
+    margin-top: 10px;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    line-height: 1.5;
+  }
+}
+
+.confirmar-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

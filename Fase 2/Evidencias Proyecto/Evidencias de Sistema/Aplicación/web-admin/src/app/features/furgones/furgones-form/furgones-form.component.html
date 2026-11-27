@@ -1,0 +1,72 @@
+<div class="form-container">
+  <div class="form-header">
+    <h2>{{ isEditMode() ? 'Editar Furgón' : 'Registrar Nuevo Furgón' }}</h2>
+    <p>Ingresa los detalles técnicos y de asignación del vehículo escolar.</p>
+  </div>
+
+  @if (errorMensaje()) {
+    <div class="rs-field-error">{{ errorMensaje() }}</div>
+  }
+
+  <form [formGroup]="furgonForm" (ngSubmit)="onSubmit()" class="form-card">
+    <div class="rs-form-field">
+      <label class="rs-label" for="patente">Patente (Matrícula)</label>
+      <input class="rs-input" id="patente" type="text" formControlName="patente" placeholder="Ej: AA-12-34" />
+      @if (furgonForm.get('patente')?.invalid && furgonForm.get('patente')?.touched) {
+        <span class="rs-field-error">Ingresa una patente válida</span>
+      }
+    </div>
+
+    <div class="rs-form-field">
+      <label class="rs-label" for="marcaModelo">Marca y Modelo</label>
+      <input class="rs-input" id="marcaModelo" type="text" formControlName="marcaModelo" placeholder="Ej: Mercedes-Benz Sprinter" />
+      @if (furgonForm.get('marcaModelo')?.invalid && furgonForm.get('marcaModelo')?.touched) {
+        <span class="rs-field-error">La marca y modelo son obligatorios</span>
+      }
+    </div>
+
+    <div class="rs-form-field">
+      <label class="rs-label" for="capacidad">Capacidad (Pasajeros)</label>
+      <input class="rs-input" id="capacidad" type="number" formControlName="capacidad" placeholder="Ej: 18" />
+      @if (furgonForm.get('capacidad')?.invalid && furgonForm.get('capacidad')?.touched) {
+        <span class="rs-field-error">Ingresa una capacidad válida superior a 0</span>
+      }
+    </div>
+
+    <!-- Sede: solo en colegios multisede. En los demás se usa la única sede, sin mostrarla. -->
+    @if (!sedeOculta()) {
+    <div class="rs-form-field">
+      <label class="rs-label" for="sede">Sede *</label>
+      <select class="rs-select" id="sede" formControlName="sede">
+        <option [ngValue]="null">{{ cargandoSedes() ? 'Cargando sedes...' : '-- Seleccionar sede --' }}</option>
+        @for (sede of sedes(); track sede.id) {
+          <option [ngValue]="sede.id">{{ sede.nombre }}</option>
+        }
+      </select>
+      @if (!cargandoSedes() && sedes().length === 0) {
+        <span class="rs-field-error">El colegio no tiene sedes activas. Revisa sus sedes antes de registrar furgones.</span>
+      }
+      @if (furgonForm.get('sede')?.invalid && furgonForm.get('sede')?.touched) {
+        <span class="rs-field-error">La sede es obligatoria</span>
+      }
+    </div>
+    }
+    <small class="rs-help">El conductor se asigna al crear o editar una ruta, eligiendo este furgón.</small>
+
+    <div class="rs-form-field">
+      <label class="rs-label" for="estado">Estado Operativo</label>
+      <select class="rs-select" id="estado" formControlName="estado">
+        <option value="disponible">Disponible</option>
+        <option value="en_ruta">En Ruta</option>
+        <option value="mantenimiento">Mantenimiento</option>
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button type="button" class="btn-secondary rs-btn rs-btn--secondary" (click)="cancelar()">Cancelar</button>
+      <button type="submit" class="btn-primary rs-btn rs-btn--primary" [disabled]="guardando() || cargandoSedes()">
+        {{ guardando() ? 'Guardando...' : (isEditMode() ? 'Actualizar' : 'Guardar') }}
+      </button>
+    </div>
+  </form>
+</div>

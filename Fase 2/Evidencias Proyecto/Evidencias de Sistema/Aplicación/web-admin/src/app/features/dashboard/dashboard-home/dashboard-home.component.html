@@ -1,0 +1,450 @@
+<!-- Vista Principal del Dashboard -->
+<div class="dashboard-page fade-in">
+  <div class="dashboard-header">
+    <div>
+      <h2>Dashboard</h2>
+      @if (colegioNombre()) {
+        <p>Resumen general de la operación de {{ colegioNombre() }}</p>
+      } @else {
+        <p>Resumen general del sistema de transporte escolar</p>
+      }
+    </div>
+    <div class="dashboard-date" aria-live="polite">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+        <path d="M16 2v4M8 2v4M3 10h18"></path>
+      </svg>
+      <div>
+        <strong>{{ fechaActual() }}</strong>
+        <span>Última actualización: {{ horaActualizacion() }}</span>
+      </div>
+    </div>
+  </div>
+
+  @if (cargando() && !tieneDatos()) {
+    <div class="dashboard-state loading" role="status" aria-live="polite">
+      <span class="state-spinner" aria-hidden="true"></span>
+      <strong>Cargando Dashboard</strong>
+      <span>Estamos obteniendo la información actualizada.</span>
+    </div>
+  } @else if (errorCarga() && !tieneDatos()) {
+    <div class="dashboard-state error" role="alert">
+      <strong>No fue posible cargar el Dashboard</strong>
+      <span>La información se actualizará automáticamente cuando se restablezca la conexión.</span>
+    </div>
+  } @else {
+    @if (datosDesactualizados()) {
+      <div class="dashboard-stale" role="status" aria-live="polite">
+        Mostrando la última información disponible. No fue posible obtener una actualización reciente.
+      </div>
+    }
+
+  <section class="records-section" aria-labelledby="records-title">
+    <div class="records-heading">
+      <h3 id="records-title">{{ colegioNombre() ? 'Registros del colegio' : 'Registros generales' }}</h3>
+      <p>Acceso rápido a la información principal</p>
+    </div>
+    <div class="stats-grid">
+    @for (stat of stats(); track stat.title) {
+      <div class="stat-card glass-panel clickable" [routerLink]="stat.route" title="Ver {{ stat.title }}">
+        <!-- Icono representativo con color de acento -->
+        <div class="stat-icon-box" [class]="'icon-' + stat.colorClass">
+          @switch (stat.icon) {
+            @case ('building') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path>
+                <path d="M6 12H4a2 2 0 0 0-2 2v8h20v-8a2 2 0 0 0-2-2h-2"></path>
+                <path d="M10 6h4"></path>
+                <path d="M10 10h4"></path>
+                <path d="M10 14h4"></path>
+                <path d="M10 18h4"></path>
+              </svg>
+            }
+            @case ('graduation-cap') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
+                <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
+              </svg>
+            }
+            @case ('bus') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="15" rx="3"></rect>
+                <path d="M7 19v2"></path>
+                <path d="M17 19v2"></path>
+                <path d="M3 11h18"></path>
+                <circle cx="7.5" cy="15.5" r="1.5"></circle>
+                <circle cx="16.5" cy="15.5" r="1.5"></circle>
+              </svg>
+            }
+            @case ('map-pin') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="10" r="3"></circle>
+                <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 6.9 8 11.7z"></path>
+              </svg>
+            }
+            @case ('steering-wheel') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <circle cx="12" cy="12" r="2"></circle>
+                <path d="M12 2v8"></path>
+                <path d="m4.93 18.07 5.66-5.66"></path>
+                <path d="m19.07 18.07-5.66-5.66"></path>
+              </svg>
+            }
+            @case ('users') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            }
+            @case ('shield') {
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                <path d="m9 12 2 2 4-4"></path>
+              </svg>
+            }
+          }
+        </div>
+
+        <!-- Información de la métrica (Título y Conteo) -->
+        <div class="stat-info">
+          <span class="stat-title">{{ stat.title }}</span>
+          <span class="stat-count">{{ stat.count }}</span>
+        </div>
+      </div>
+    }
+    </div>
+  </section>
+
+  <!-- Sección Alertas y Pendientes (Exclusivo para Admin Colegio) -->
+  @if (alertas()) {
+    <div class="alerts-section" [class.all-clear-section]="totalAlertas() === 0">
+      <div class="section-header">
+        <div class="section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+          <div>
+            <div class="section-title-row">
+              <h3>Alertas y pendientes</h3>
+              <span
+                class="alerts-count"
+                [class.all-clear]="totalAlertas() === 0"
+                [attr.aria-label]="totalAlertas() === 1 ? '1 pendiente' : totalAlertas() + ' pendientes'"
+              >
+                {{ totalAlertas() }}
+              </span>
+            </div>
+            <p class="section-subtitle">Panel operativo de regularizaciones y datos pendientes del colegio</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="alerts-grid">
+        @if (totalAlertas() > 0) {
+          <!-- 🔴 ALERTA ROJA: Sin conductor asignado -->
+          @if (alertas()!.estudiantes_sin_conductor > 0) {
+            <div
+              class="alert-card danger clickable"
+              [routerLink]="['/estudiantes']"
+              [queryParams]="{ filtro: 'sin_conductor' }"
+              title="Asignar transporte a estudiantes"
+            >
+              <div class="alert-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="8" x2="12" y2="12"></line>
+                  <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                </svg>
+              </div>
+              <div class="alert-content">
+                <span class="alert-card-title">Sin conductor asignado</span>
+                <span class="alert-card-desc">
+                  <strong>{{ alertas()!.estudiantes_sin_conductor }}</strong>
+                  {{ alertas()!.estudiantes_sin_conductor === 1 ? 'estudiante no tiene' : 'estudiantes no tienen' }} conductor asignado.
+                </span>
+              </div>
+              <div class="alert-action">
+                <span>Asignar</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            </div>
+          }
+
+          <!-- 🔴 ALERTA ROJA: Datos de entrega incompletos -->
+          @if (alertas()!.estudiantes_datos_incompletos > 0) {
+            <div
+              class="alert-card danger clickable"
+              [routerLink]="['/estudiantes']"
+              [queryParams]="{ filtro: 'datos_incompletos' }"
+              title="Completar datos de retiro de estudiantes"
+            >
+              <div class="alert-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                  <polyline points="14 2 14 8 20 8"></polyline>
+                  <line x1="12" y1="18" x2="12" y2="12"></line>
+                  <line x1="9" y1="15" x2="15" y2="15"></line>
+                </svg>
+              </div>
+              <div class="alert-content">
+                <span class="alert-card-title">Datos de entrega incompletos</span>
+                <span class="alert-card-desc">
+                  <strong>{{ alertas()!.estudiantes_datos_incompletos }}</strong>
+                  {{ alertas()!.estudiantes_datos_incompletos === 1 ? 'estudiante no tiene' : 'estudiantes no tienen' }} dirección completa o confirmada.
+                </span>
+              </div>
+              <div class="alert-action">
+                <span>Completar</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            </div>
+          }
+
+          <!-- 🟡 ALERTA AMARILLA: Biometría pendiente -->
+          @if (alertas()!.estudiantes_sin_biometria > 0) {
+            <div
+              class="alert-card warning clickable"
+              [routerLink]="['/estudiantes']"
+              [queryParams]="{ filtro: 'sin_biometria' }"
+              title="Ver estudiantes sin biometría"
+            >
+              <div class="alert-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </div>
+              <div class="alert-content">
+                <span class="alert-card-title">Biometría pendiente</span>
+                <span class="alert-card-desc">
+                  <strong>{{ alertas()!.estudiantes_sin_biometria }}</strong>
+                  {{ alertas()!.estudiantes_sin_biometria === 1 ? 'estudiante aún no tiene' : 'estudiantes aún no tienen' }} biometría registrada.
+                </span>
+              </div>
+              <div class="alert-action">
+                <span>Revisar</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            </div>
+          }
+
+          <!-- 🟡 ALERTA AMARILLA: Furgones sin conductor -->
+          @if (alertas()!.furgones_sin_conductor > 0) {
+            <div
+              class="alert-card warning clickable"
+              [routerLink]="['/rutas/nuevo']"
+              title="Crear una asignación operacional de ruta, conductor y furgón"
+            >
+              <div class="alert-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="15" rx="3"></rect>
+                  <path d="M7 19v2"></path>
+                  <path d="M17 19v2"></path>
+                  <path d="M3 11h18"></path>
+                </svg>
+              </div>
+              <div class="alert-content">
+                <span class="alert-card-title">Furgones sin conductor</span>
+                <span class="alert-card-desc">
+                  <strong>{{ alertas()!.furgones_sin_conductor }}</strong>
+                  {{ alertas()!.furgones_sin_conductor === 1 ? 'furgón no tiene' : 'furgones no tienen' }} conductor asignado.
+                </span>
+              </div>
+              <div class="alert-action">
+                <span>Revisar</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            </div>
+          }
+
+          <!-- 🔴 ALERTA: Sedes sin inspector (nadie puede recibir a los estudiantes) -->
+          @if ((alertas()!.sedes_sin_inspector || 0) > 0) {
+            <div
+              class="alert-card danger clickable"
+              [routerLink]="['/delegados/nuevo']"
+              title="Registrar un inspector"
+            >
+              <div class="alert-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 21h18M5 21V8l7-5 7 5v13"></path>
+                  <path d="M9 21v-6h6v6"></path>
+                </svg>
+              </div>
+              <div class="alert-content">
+                @if (colegioMultisede()) {
+                  <span class="alert-card-title">Sedes sin inspector</span>
+                  <span class="alert-card-desc">
+                    <strong>{{ alertas()!.sedes_sin_inspector }}</strong>
+                    {{ alertas()!.sedes_sin_inspector === 1 ? 'sede no tiene' : 'sedes no tienen' }} inspector:
+                    nadie puede recibir a sus estudiantes en el colegio.
+                  </span>
+                } @else {
+                  <span class="alert-card-title">Colegio sin inspector</span>
+                  <span class="alert-card-desc">
+                    El colegio no tiene inspector: nadie puede recibir a sus estudiantes en el colegio.
+                  </span>
+                }
+              </div>
+              <div class="alert-action">
+                <span>Registrar</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            </div>
+          }
+
+          <!-- 🟡 ALERTA AMARILLA: Rutas sin furgón (no se pueden iniciar) -->
+          @if ((alertas()!.rutas_sin_furgon || 0) > 0) {
+            <div
+              class="alert-card warning clickable"
+              [routerLink]="['/rutas']"
+              title="Asignar furgón a las rutas"
+            >
+              <div class="alert-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="15" rx="3"></rect>
+                  <path d="M7 19v2"></path>
+                  <path d="M17 19v2"></path>
+                  <path d="M3 11h18"></path>
+                </svg>
+              </div>
+              <div class="alert-content">
+                <span class="alert-card-title">Rutas sin furgón</span>
+                <span class="alert-card-desc">
+                  <strong>{{ alertas()!.rutas_sin_furgon }}</strong>
+                  {{ alertas()!.rutas_sin_furgon === 1 ? 'ruta no tiene' : 'rutas no tienen' }} furgón: no se pueden iniciar.
+                </span>
+              </div>
+              <div class="alert-action">
+                <span>Revisar</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            </div>
+          }
+
+          <!-- 🟡 ALERTA AMARILLA: Rutas sin conductor -->
+          @if (alertas()!.rutas_sin_conductor > 0) {
+            <div
+              class="alert-card warning clickable"
+              [routerLink]="['/rutas']"
+              [queryParams]="{ filtro: 'sin_conductor' }"
+              title="Asignar conductor a rutas"
+            >
+              <div class="alert-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="10" r="3"></circle>
+                  <path d="M12 21.7C17.3 17 20 13 20 10a8 8 0 1 0-16 0c0 3 2.7 6.9 8 11.7z"></path>
+                </svg>
+              </div>
+              <div class="alert-content">
+                <span class="alert-card-title">Rutas sin conductor</span>
+                <span class="alert-card-desc">
+                  <strong>{{ alertas()!.rutas_sin_conductor }}</strong>
+                  {{ alertas()!.rutas_sin_conductor === 1 ? 'ruta no tiene' : 'rutas no tienen' }} conductor asignado.
+                </span>
+              </div>
+              <div class="alert-action">
+                <span>Revisar</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="5" y1="12" x2="19" y2="12"></line>
+                  <polyline points="12 5 19 12 12 19"></polyline>
+                </svg>
+              </div>
+            </div>
+          }
+        } @else {
+          <!-- 🟢 ESTADO VERDE: Todo listo para operar -->
+          <div class="alert-card success">
+            <div class="alert-icon-box">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+              </svg>
+            </div>
+            <div class="alert-content">
+              <span class="alert-card-title">Todo listo para operar</span>
+              <span class="alert-card-desc">No hay configuraciones pendientes detectadas en el colegio.</span>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  @if (operacionHoy(); as operacion) {
+    <section class="operation-section" aria-labelledby="operation-title">
+      <div class="operation-heading">
+        <div>
+          <h3 id="operation-title">Operación de hoy</h3>
+          <p>Estado actual del transporte escolar en este colegio</p>
+        </div>
+      </div>
+
+      <div class="operation-grid">
+        <article class="operation-item routes">
+          <div class="operation-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="15" rx="3"></rect>
+              <path d="M3 11h18M7 19v2M17 19v2"></path>
+            </svg>
+          </div>
+          <div><strong>{{ operacion.rutas_en_recorrido }}</strong><span>Rutas en recorrido</span></div>
+        </article>
+
+        <article class="operation-item students">
+          <div class="operation-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <div><strong>{{ operacion.estudiantes_a_bordo }}</strong><span>Estudiantes a bordo</span></div>
+        </article>
+
+        <article class="operation-item completed">
+          <div class="operation-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="3"></rect>
+              <path d="m8 12 3 3 5-6"></path>
+            </svg>
+          </div>
+          <div><strong>{{ operacion.recorridos_completados }}</strong><span>Recorridos completados hoy</span></div>
+        </article>
+
+        <article class="operation-item incidents">
+          <div class="operation-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="9"></circle>
+              <path d="M12 7v6l4 2"></path>
+            </svg>
+          </div>
+          <div><strong>{{ operacion.incidencias }}</strong><span>Incidencias de hoy</span></div>
+        </article>
+      </div>
+    </section>
+  }
+  }
+</div>

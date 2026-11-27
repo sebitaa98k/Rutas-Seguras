@@ -1,0 +1,59 @@
+<div class="terminos">
+  @if (cargando) {
+    <div class="estado">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  } @else if (error) {
+    <div class="estado">
+      <p role="alert">{{ error }}</p>
+      <ion-button fill="outline" class="rs-button" (click)="cargar()">Reintentar</ion-button>
+      <ion-button fill="clear" class="rs-button" (click)="cancelar.emit()">{{ textoCancelar }}</ion-button>
+    </div>
+  } @else {
+    <header>
+      <h2>{{ titulo }}</h2>
+      <span>Versión {{ version }}</span>
+    </header>
+
+    <div #zonaTexto class="texto" tabindex="0" (scroll)="revisarLectura()">
+      @for (bloque of bloques; track $index) {
+        @if (bloque.esTitulo) {
+          <h3>{{ bloque.texto }}</h3>
+        } @else {
+          <p>{{ bloque.texto }}</p>
+        }
+      }
+    </div>
+
+    <footer>
+      @if (!llegoAlFinal) {
+        <p class="aviso">Baja hasta el final del texto para poder aceptar.</p>
+      }
+
+      <ion-checkbox
+        labelPlacement="end"
+        justify="start"
+        [disabled]="!llegoAlFinal"
+        [(ngModel)]="aceptaTerminos">
+        <span class="casilla">He leído y acepto los términos y condiciones.</span>
+      </ion-checkbox>
+
+      <!-- Términos 1.2: la biometría ya no se acepta aquí; se autoriza por cada hijo. -->
+      <p class="aviso aviso-biometria">
+        Aceptar los términos no autoriza el reconocimiento facial. Si quieres usarlo, lo autorizas
+        por separado para cada hijo al inscribirlo o desde su detalle. Sin él, sube y baja con tu código QR.
+      </p>
+
+      <ion-button expand="block" class="rs-button rs-button--primary" [disabled]="!puedeAceptar" (click)="confirmar()">
+        @if (enviando) {
+          <ion-spinner name="crescent"></ion-spinner>
+        } @else {
+          {{ textoAceptar }}
+        }
+      </ion-button>
+      <ion-button expand="block" fill="clear" class="rs-button rs-button--tertiary" [disabled]="enviando" (click)="cancelar.emit()">
+        {{ textoCancelar }}
+      </ion-button>
+    </footer>
+  }
+</div>

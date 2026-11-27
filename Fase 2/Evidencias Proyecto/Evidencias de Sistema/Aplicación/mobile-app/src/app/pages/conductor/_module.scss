@@ -1,0 +1,288 @@
+/* Fase 4B: capa visual operativa compartida del módulo Conductor. */
+:host {
+  --verde-rutas: var(--rs-color-primary);
+  --verde-rutas-oscuro: var(--rs-color-primary-hover);
+  --verde-suave: var(--rs-color-primary-soft);
+  --fondo: var(--rs-color-background);
+  --blanco: var(--rs-color-surface);
+  --texto-principal: var(--rs-color-text);
+  --texto-secundario: var(--rs-color-text-muted);
+  --borde: var(--rs-color-border);
+}
+
+.driver-page,
+.route-page,
+.facial-page,
+.scanner-page-container,
+.incident-page,
+.profile-page-container {
+  color: var(--rs-color-text);
+  background: var(--rs-color-background);
+}
+
+.section-label,
+.welcome-label,
+.eyebrow,
+.mode-title {
+  color: var(--rs-color-primary);
+  font-size: var(--rs-font-size-xs);
+  font-weight: var(--rs-font-weight-bold);
+  letter-spacing: 0.08em;
+}
+
+.student-card,
+.next-stop-card,
+.notice-card,
+.start-route-card,
+.map-card,
+.map-locked-card,
+.boarding-notice,
+.finished-card,
+.stop-card,
+.mode-selector-card,
+.camera-section,
+.result-card,
+.viewfinder-card,
+.manual-input-card,
+.loading-consulting-card,
+.success-summary-card,
+.card,
+.student-radio-item,
+.profile-main-card,
+.info-card {
+  border: 1px solid var(--rs-color-border) !important;
+  border-radius: var(--rs-card-radius) !important;
+  background: var(--rs-color-surface) !important;
+  box-shadow: var(--rs-shadow-card) !important;
+}
+
+.student-card,
+.next-stop-card,
+.notice-card,
+.start-route-card,
+.boarding-notice,
+.finished-card,
+.stop-card,
+.mode-selector-card,
+.result-card,
+.manual-input-card,
+.loading-consulting-card,
+.success-summary-card,
+.card,
+.student-radio-item,
+.profile-main-card,
+.info-card {
+  padding: var(--rs-card-padding) !important;
+}
+
+.route-icon,
+.student-avatar,
+.next-stop-icon,
+.notice-icon,
+.stop-icon,
+.avatar-box,
+.subject-avatar,
+.success-icon-wrapper,
+.avatar-circle,
+.info-icon {
+  background: var(--rs-color-primary-soft) !important;
+  color: var(--rs-color-primary) !important;
+}
+
+.status-badge,
+.student-count,
+.role-chip,
+.role-pill,
+.badge-live,
+.count-badge,
+.status-chip {
+  border-radius: var(--rs-radius-pill) !important;
+}
+
+.student-status.status-route,
+.success-badge,
+.completed-count,
+.active-status,
+.verified-badge {
+  background: var(--rs-color-success-soft) !important;
+  color: var(--rs-color-success) !important;
+}
+
+.student-status.status-pending,
+.boarding-notice,
+.notice,
+.no-students-warning {
+  background: var(--rs-color-warning-soft) !important;
+  color: var(--rs-color-warning) !important;
+}
+
+.student-status.status-absent,
+.danger-badge,
+.danger-card,
+.outside-home,
+.not-attending-note {
+  background: var(--rs-color-danger-soft) !important;
+  color: var(--rs-color-danger) !important;
+}
+
+.primary-action,
+.scan-action-btn,
+.confirm-btn,
+.confirm-button,
+.finish-btn,
+.manual-btn,
+.action-btn.primary {
+  min-height: var(--rs-control-height) !important;
+  border-radius: var(--rs-button-radius) !important;
+  background: var(--rs-color-primary) !important;
+  color: var(--rs-color-surface) !important;
+}
+
+.start-route-button {
+  --background: var(--rs-color-surface);
+  --background-hover: var(--rs-color-primary-subtle);
+  --background-activated: var(--rs-color-primary-soft);
+  --color: var(--rs-color-primary);
+  --border-radius: var(--rs-button-radius);
+  --box-shadow: none;
+  min-height: var(--rs-control-height);
+}
+
+.secondary-action,
+.retry-btn,
+.retry-cam-btn,
+.reset-button,
+.secondary-btn,
+.action-btn.secondary {
+  min-height: 44px;
+  border-color: var(--rs-color-primary) !important;
+  border-radius: var(--rs-button-radius) !important;
+  color: var(--rs-color-primary) !important;
+}
+
+.danger-action,
+.absent-action,
+.finish-route-button,
+.send-btn,
+.danger-retry {
+  min-height: 44px;
+  border-radius: var(--rs-button-radius) !important;
+  background: var(--rs-color-danger) !important;
+  color: var(--rs-color-surface) !important;
+}
+
+.map-button,
+.flash-btn,
+.small-action-btn,
+.select-all-btn {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+.select-field,
+.text-field,
+.manual-input,
+.note-field,
+.input-item {
+  min-height: var(--rs-control-height);
+  border: 1px solid var(--rs-color-border) !important;
+  border-radius: var(--rs-input-radius) !important;
+  background: var(--rs-color-surface) !important;
+  color: var(--rs-color-text) !important;
+}
+
+.select-field:focus,
+.text-field:focus,
+.manual-input:focus,
+.note-field:focus,
+.input-item:focus-within {
+  border-color: var(--rs-color-primary) !important;
+  outline: none;
+  box-shadow: var(--rs-focus-ring) !important;
+}
+
+.loading-box,
+.error-box,
+.empty-box,
+.camera-loading,
+.camera-error,
+.loading-students,
+.no-students-warning {
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rs-space-3);
+  padding: var(--rs-space-6);
+  border-radius: var(--rs-card-radius);
+  text-align: center;
+  color: var(--rs-color-text-muted);
+}
+
+.error-box,
+.camera-error {
+  border: 1px solid var(--rs-color-danger);
+  background: var(--rs-color-danger-soft);
+  color: var(--rs-color-danger);
+}
+
+.camera-viewport,
+.camera-frame,
+.leaflet-route-map {
+  overflow: hidden;
+  border: 1px solid var(--rs-color-border) !important;
+  border-radius: var(--rs-card-radius) !important;
+}
+
+.student-info,
+.stop-content,
+.route-status-info,
+.next-stop-info,
+.notice-content,
+.subject-text,
+.profile-main-info,
+.info-content {
+  min-width: 0;
+}
+
+.student-info h3,
+.stop-content h3,
+.route-status-info h2,
+.next-stop-info h3,
+.notification-title,
+.info-value {
+  color: var(--rs-color-text) !important;
+}
+
+.parent-info,
+.footer-text,
+.footer-message,
+.mode-hint,
+.security-note,
+.student-sub-info,
+.user-email,
+.info-label {
+  color: var(--rs-color-text-muted) !important;
+}
+
+@media (max-width: 360px) {
+  .route-status-card,
+  .student-card,
+  .next-stop-card,
+  .stop-card,
+  .result-card,
+  .card,
+  .profile-main-card {
+    padding: var(--rs-space-3) !important;
+  }
+
+  .secondary-actions,
+  .mode-buttons,
+  .card-actions,
+  .success-actions,
+  .chips {
+    flex-wrap: wrap;
+    gap: var(--rs-space-2);
+  }
+}

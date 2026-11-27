@@ -1,0 +1,117 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1>{{ soloContacto ? 'Mi colegio' : (esEdicion() ? 'Editar Colegio' : 'Nuevo Colegio') }}</h1>
+      <p class="subtitle">
+        {{ soloContacto
+          ? 'Puedes actualizar el teléfono y el correo de contacto. Los demás datos los administra la plataforma.'
+          : (esEdicion() ? 'Modifica los datos del establecimiento' : 'Registra una nueva institución educativa en la plataforma') }}
+      </p>
+    </div>
+    <a [routerLink]="rutaVolver" class="btn btn-secondary rs-btn rs-btn--secondary">← Volver</a>
+  </div>
+
+  <div class="form-card">
+    <form (ngSubmit)="guardar()">
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label>Nombre del Colegio *</label>
+          <input
+            type="text"
+            placeholder="ej: Colegio San Agustín"
+            required
+            [disabled]="soloContacto"
+            [ngModel]="formData().nombre"
+            (ngModelChange)="formData.update(f => ({ ...f, nombre: $event }))"
+            name="nombre"
+          />
+        </div>
+
+        <div class="form-group">
+          <label>RBD / Registro Oficial *</label>
+          <input
+            type="text"
+            placeholder="ej: 12345-6"
+            required
+            [disabled]="soloContacto"
+            [ngModel]="formData().rbd"
+            (ngModelChange)="formData.update(f => ({ ...f, rbd: $event }))"
+            name="rbd"
+          />
+        </div>
+
+        @if (!soloContacto) {
+          <div class="form-group full-width">
+            <label>Plan *</label>
+            <select
+              name="plan"
+              [ngModel]="formData().plan"
+              (ngModelChange)="formData.update(f => ({ ...f, plan: $event }))"
+            >
+              @for (plan of planes; track plan.valor) {
+                <option [ngValue]="plan.valor">{{ plan.nombre }} — {{ plan.detalle }}</option>
+              }
+            </select>
+            <small class="plan-ayuda">
+              {{ formData().plan === 'avanzado'
+                ? 'Multisede: la sede principal se crea con los datos del colegio y luego puedes agregar más sedes.'
+                : 'Una sola sede: se crea automáticamente con los datos del colegio y no se muestra.' }}
+            </small>
+          </div>
+        }
+
+        <div class="form-group">
+          <label>Teléfono Institucional *</label>
+          <input
+            type="text"
+            placeholder="+56 2 2233 4455"
+            [ngModel]="formData().telefono"
+            (ngModelChange)="formData.update(f => ({ ...f, telefono: $event }))"
+            name="telefono"
+          />
+        </div>
+
+        @if (soloContacto) {
+          <div class="form-group full-width">
+            <label>Dirección</label>
+            <input type="text" disabled [value]="formData().direccion + ', ' + formData().comuna + ', ' + formData().region" />
+          </div>
+        } @else {
+        <div class="form-group full-width">
+          <app-selector-ubicacion
+            etiqueta="Dirección *"
+            placeholder="Av. Providencia 1234"
+            textoMarcador="Acceso vehicular del colegio"
+            [direccion]="formData().direccion"
+            [comuna]="formData().comuna"
+            [region]="formData().region"
+            [latitud]="formData().latitud"
+            [longitud]="formData().longitud"
+            (ubicacionCambio)="ubicacionCambio($event)"
+          />
+        </div>
+        }
+
+        <div class="form-group full-width">
+          <label>Correo Electrónico de Contacto *</label>
+          <input
+            type="email"
+            placeholder="contacto@colegiosanagustin.cl"
+            [ngModel]="formData().email_contacto"
+            (ngModelChange)="formData.update(f => ({ ...f, email_contacto: $event }))"
+            name="email_contacto"
+          />
+        </div>
+
+        <!-- Un colegio se desactiva solo con el botón "Desactivar" de la lista y se reactiva desde la Papelera. -->
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary rs-btn rs-btn--primary" [disabled]="guardando()">
+          {{ guardando() ? 'Guardando...' : (esEdicion() ? 'Guardar Cambios' : 'Crear Colegio') }}
+        </button>
+        <a [routerLink]="rutaVolver" class="btn btn-secondary rs-btn rs-btn--secondary">Cancelar</a>
+      </div>
+    </form>
+  </div>
+</div>

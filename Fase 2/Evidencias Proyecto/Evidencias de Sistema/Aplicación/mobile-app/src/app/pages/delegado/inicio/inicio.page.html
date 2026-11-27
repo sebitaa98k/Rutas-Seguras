@@ -1,0 +1,139 @@
+<ion-content [fullscreen]="true">
+  <main class="page-container">
+    <header class="header-section rs-page-header">
+      <div class="header-user">
+        <div class="badge-role">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          <span>{{ esInspector ? 'Inspector del establecimiento' : 'Persona autorizada' }}</span>
+        </div>
+        <h1>Hola, {{ usuario?.first_name || 'Delegado' }}</h1>
+        <p class="assignment-text">{{ esInspector ? nombreAsignacion : 'RUT ' + (usuario?.rut || 'sin registrar') }}</p>
+      </div>
+      <ion-menu-toggle menu="main-menu">
+        <button class="logout-btn rs-header-action" type="button" aria-label="Abrir menú de cuenta">
+          <ion-icon name="menu-outline"></ion-icon>
+        </button>
+      </ion-menu-toggle>
+    </header>
+
+    @if (cargando) {
+      <section class="loading-box" aria-live="polite">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando alumnos...</p>
+      </section>
+    } @else if (errorMensaje) {
+      <section class="empty-card error-card">
+        <h2>No pudimos cargar la información</h2>
+        <p>{{ errorMensaje }}</p>
+        <ion-button fill="outline" (click)="cargarEstudiantes()">Reintentar</ion-button>
+      </section>
+    } @else {
+      <section class="summary-grid" aria-label="Resumen de alumnos">
+        <article class="summary-card primary">
+          <ion-icon name="people-outline"></ion-icon>
+          <div><strong>{{ estudiantes.length }}</strong><span>Alumnos asignados</span></div>
+        </article>
+        <article class="summary-card">
+          <ion-icon name="bus-outline"></ion-icon>
+          <div><strong>{{ totalConConductor }}</strong><span>Con transporte</span></div>
+        </article>
+      </section>
+
+      <section class="quick-actions" aria-label="Accesos rápidos">
+        <a class="quick-action" [routerLink]="['/delegado/seguimiento']">
+          <span class="quick-icon track-bg"><ion-icon name="navigate-outline"></ion-icon></span>
+          <span><strong>Ver ruta</strong><small>Seguimiento en vivo</small></span>
+        </a>
+        <a class="quick-action" [routerLink]="['/delegado/perfil']">
+          <span class="quick-icon profile-bg"><ion-icon name="person-outline"></ion-icon></span>
+          <span><strong>Mi perfil</strong><small>Datos personales</small></span>
+        </a>
+      </section>
+
+      <section class="students-section">
+        <div class="section-title">
+          <div>
+            <p class="eyebrow">DIRECTORIO</p>
+            <h2>{{ esInspector ? 'Alumnos a tu cargo' : 'Estudiantes autorizados' }}</h2>
+          </div>
+          <span class="count-badge">{{ estudiantesFiltrados.length }}</span>
+        </div>
+
+        @if (estudiantes.length > 0) {
+          <div class="filters-panel">
+            <label class="search-box">
+              <ion-icon name="search-outline"></ion-icon>
+              <input type="search" [(ngModel)]="busqueda" placeholder="Buscar por nombre, RUT o curso" />
+            </label>
+            <label class="course-filter">
+              <ion-icon name="options-outline"></ion-icon>
+              <select [(ngModel)]="cursoSeleccionado" aria-label="Filtrar por curso">
+                <option value="">Todos los cursos</option>
+                @for (curso of cursos; track curso) {
+                  <option [value]="curso">{{ curso }}</option>
+                }
+              </select>
+            </label>
+          </div>
+        }
+
+        @if (estudiantes.length === 0) {
+          <div class="empty-card">
+            <ion-icon name="people-outline"></ion-icon>
+            <h3>Sin alumnos asignados</h3>
+            @if (esInspector) {
+              <p>Todavía no hay alumnos registrados en {{ nombreAsignacion }}.</p>
+            } @else {
+              <p>Solicita al apoderado que registre tu RUT como persona autorizada.</p>
+            }
+          </div>
+        } @else if (estudiantesFiltrados.length === 0) {
+          <div class="empty-card compact">
+            <h3>Sin resultados</h3>
+            <p>No encontramos alumnos con esos filtros.</p>
+            <button class="text-button" type="button" (click)="limpiarFiltros()">Limpiar filtros</button>
+          </div>
+        }
+
+        <div class="student-list">
+          @for (est of estudiantesFiltrados; track est.id) {
+            <article class="student-card">
+              <div class="student-header">
+                <div class="student-avatar">{{ est.nombre.charAt(0) || 'A' }}{{ est.apellido.charAt(0) }}</div>
+                <div class="student-names">
+                  <h3>{{ est.nombre_completo }}</h3>
+                  <p>{{ est.curso || 'Curso sin registrar' }} · RUT {{ est.rut }}</p>
+                </div>
+                <span class="transport-tag" [class.pending]="!est.conductor_nombre">
+                  {{ est.conductor_nombre ? 'Con transporte' : 'Sin conductor' }}
+                </span>
+              </div>
+
+              <div class="student-meta">
+                <div><span>Establecimiento</span><strong>{{ est.sede_nombre || est.colegio_nombre || nombreAsignacion }}</strong></div>
+                <div><span>Apoderado</span><strong>{{ est.apoderado_nombre || 'No registrado' }}</strong></div>
+                <div><span>Conductor</span><strong>{{ est.conductor_nombre || 'No asignado' }}</strong></div>
+              </div>
+
+              <div class="card-actions">
+                @if (est.apoderado_telefono) {
+                  <button class="contact-button" type="button" (click)="llamarTelefono(est.apoderado_telefono)">
+                    <ion-icon name="call-outline"></ion-icon><span>Apoderado</span>
+                  </button>
+                }
+                @if (est.conductor_telefono) {
+                  <button class="contact-button" type="button" (click)="llamarTelefono(est.conductor_telefono)">
+                    <ion-icon name="bus-outline"></ion-icon><span>Conductor</span>
+                  </button>
+                }
+                <a class="qr-button" [routerLink]="['/delegado/mi-qr']" [queryParams]="{ estudianteId: est.id }">
+                  <ion-icon name="qr-code-outline"></ion-icon><span>Ver QR</span>
+                </a>
+              </div>
+            </article>
+          }
+        </div>
+      </section>
+    }
+  </main>
+</ion-content>

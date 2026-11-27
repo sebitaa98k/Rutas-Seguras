@@ -1,0 +1,151 @@
+<div class="form-page fade-in">
+  <div class="form-header">
+    <div class="header-left">
+      <a routerLink="/delegados" class="btn-back" title="Volver a la lista">
+        ← Volver
+      </a>
+      <div>
+        <h2>{{ tituloFormulario }}</h2>
+        <p>{{ isEditMode ? 'Actualiza los datos y el tipo de la persona registrada.' : 'Registra una persona autorizada para retiro o un delegado del establecimiento.' }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-card glass-panel">
+    <form [formGroup]="delegadoForm" (ngSubmit)="onSubmit()">
+
+      <div class="form-grid">
+        <fieldset class="delegate-type-section col-span-2">
+          <legend>Tipo de delegado</legend>
+          <p class="field-help" id="delegate-type-help">
+            {{ isEditMode ? 'El tipo no se puede cambiar una vez creado. Si corresponde a otro tipo, desactívalo y registra uno nuevo.' : 'Selecciona el rol que tendrá esta persona dentro de Rutas Seguras.' }}
+          </p>
+
+          <div class="delegate-type-grid" aria-describedby="delegate-type-help">
+            <label class="delegate-type-option">
+              <input type="radio" formControlName="tipo_delegado" value="autorizado" />
+              <span class="delegate-type-card">
+                <span class="delegate-type-icon" aria-hidden="true">
+                  <svg class="delegate-option-svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M2 21v-2a7 7 0 0 1 14 0v2"></path>
+                    <path d="m16 11 2 2 4-4"></path>
+                  </svg>
+                </span>
+                <span class="delegate-type-copy">
+                  <strong>Persona autorizada para retiro</strong>
+                  <span>Persona registrada por un apoderado y autorizada para recibir al estudiante.</span>
+                </span>
+                <span class="selection-indicator" aria-hidden="true"></span>
+              </span>
+            </label>
+
+            <label class="delegate-type-option">
+              <input type="radio" formControlName="tipo_delegado" value="sede" />
+              <span class="delegate-type-card">
+                <span class="delegate-type-icon" aria-hidden="true">
+                  <svg class="delegate-option-svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 21h18M5 21V8l7-5 7 5v13"></path>
+                    <path d="M9 21v-6h6v6M9 10h.01M15 10h.01"></path>
+                  </svg>
+                </span>
+                <span class="delegate-type-copy">
+                  <strong>Delegado del colegio</strong>
+                  <span>Personal del establecimiento autorizado para apoyar la supervisión y entrega de estudiantes.</span>
+                </span>
+                <span class="selection-indicator" aria-hidden="true"></span>
+              </span>
+            </label>
+          </div>
+
+          @if (sedesCargadas && sedes.length === 0 && tipoDelegado === 'sede') {
+            <span class="context-note">Este colegio no tiene sedes activas. Revisa sus sedes antes de registrar a un inspector.</span>
+          }
+        </fieldset>
+
+        @if (tipoDelegado === 'sede' && sedes.length > 0 && !sedeOculta) {
+          <div class="form-group col-span-2">
+            <label for="sede_id">Sede del inspector <span class="required">*</span></label>
+            <select id="sede_id" formControlName="sede_id">
+              <option [ngValue]="null">Seleccione una sede</option>
+              @for (sede of sedes; track sede.id) {
+                <option [ngValue]="sede.id">{{ sede.nombre }}</option>
+              }
+            </select>
+          </div>
+        }
+        <div class="form-group">
+          <label for="nombre">Nombres <span class="required">*</span></label>
+          <input id="nombre" type="text" formControlName="nombre" placeholder="Ej: Juan Carlos" [class.invalid]="isFieldInvalid('nombre')" />
+          @if (isFieldInvalid('nombre')) {
+            <span class="error-text">Ingresa al menos un nombre.</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="apellido">Apellidos <span class="required">*</span></label>
+          <input id="apellido" type="text" formControlName="apellido" placeholder="Ej: Pérez Soto" [class.invalid]="isFieldInvalid('apellido')" />
+          @if (isFieldInvalid('apellido')) {
+            <span class="error-text">Ingresa al menos un apellido.</span>
+          }
+        </div>
+
+        <!-- RUT -->
+        <div class="form-group">
+          <label for="rut">RUT <span class="required">*</span></label>
+          <input
+            id="rut"
+            type="text"
+            formControlName="rut"
+            placeholder="Ej. 12.345.678-9"
+            [class.invalid]="isFieldInvalid('rut')"
+          />
+          @if (isFieldInvalid('rut')) {
+            <span class="error-text">Ingrese un RUT válido.</span>
+          }
+        </div>
+
+        <!-- Teléfono -->
+        <div class="form-group">
+          <label for="telefono">Teléfono <span class="required">*</span></label>
+          <input
+            id="telefono"
+            type="text"
+            formControlName="telefono"
+            placeholder="+56 9 1234 5678"
+            [class.invalid]="isFieldInvalid('telefono')"
+          />
+          @if (isFieldInvalid('telefono')) {
+            <span class="error-text">Ingrese un número de teléfono válido.</span>
+          }
+        </div>
+
+        <!-- Correo Electrónico -->
+        <div class="form-group col-span-2">
+          <label for="correo">Correo Electrónico (Usuario) <span class="required">*</span></label>
+          <input
+            id="correo"
+            type="email"
+            formControlName="correo"
+            placeholder="ejemplo@correo.cl"
+            [class.invalid]="isFieldInvalid('correo')"
+          />
+          @if (isFieldInvalid('correo')) {
+            <span class="error-text">Ingrese un correo electrónico válido.</span>
+          }
+        </div>
+
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-secondary rs-btn rs-btn--secondary" (click)="onCancel()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-primary rs-btn rs-btn--primary" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Guardando...' : (isEditMode ? 'Actualizar' : 'Registrar') }}
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>

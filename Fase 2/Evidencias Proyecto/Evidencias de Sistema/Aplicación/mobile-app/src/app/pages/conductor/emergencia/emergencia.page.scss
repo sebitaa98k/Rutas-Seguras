@@ -1,0 +1,220 @@
+@use '../module';
+
+:host {
+  --verde: #0f766e;
+  --verde-suave: #e8f5f3;
+  --fondo: #f7faf9;
+  --texto: #173330;
+  --borde: #dce7e5;
+}
+
+.incident-page {
+  min-height: 100%;
+  background: var(--fondo);
+  padding: 24px 20px 40px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 22px;
+}
+
+.eyebrow {
+  color: var(--verde);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+h1 {
+  margin: 4px 0;
+  color: var(--texto);
+}
+
+.header p {
+  margin: 0;
+  color: #6b7c79;
+}
+
+.menu-btn {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  background: #fff;
+}
+
+.card {
+  background: #fff;
+  border-radius: 22px;
+  padding: 20px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 700;
+  color: var(--texto);
+}
+
+.chips {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.chip {
+  flex: 1;
+  height: 42px;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.chip.active {
+  background: var(--verde-suave);
+  border-color: var(--verde);
+  color: var(--verde);
+  font-weight: 700;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+
+.student-picker-field {
+  background: var(--fondo);
+  border-radius: 16px;
+  padding: 12px;
+  border: 1px solid var(--borde);
+}
+
+.loading-students, .no-students-warning {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 14px;
+  color: #6b7c79;
+}
+
+.no-students-warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+.student-select-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.student-radio-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #ffffff;
+  border: 1.5px solid var(--borde);
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: #a3d0c9;
+  }
+
+  &.selected {
+    border-color: var(--verde);
+    background: var(--verde-suave);
+  }
+}
+
+.radio-icon {
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  color: var(--verde);
+
+  ion-icon {
+    font-size: 22px;
+  }
+}
+
+.student-details {
+  display: flex;
+  flex-direction: column;
+
+  .student-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--texto);
+  }
+
+  .student-rut {
+    font-size: 13px;
+    color: #5c6f6c;
+    margin-top: 2px;
+  }
+}
+
+input, select, textarea {
+  width: 100%;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 12px;
+  font: inherit;
+}
+
+.notice {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--verde-suave);
+  color: var(--verde);
+  margin-bottom: 18px;
+}
+
+.send-btn {
+  width: 100%;
+  height: 48px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--verde);
+  color: #fff;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Estado del niño en la ruta (lista de emergencia de estudiante).
+.estado-en-ruta {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+
+  background: #fef3c7;
+  color: #92400e;
+
+  font-size: 12px;
+  font-weight: 700;
+
+  &--abordo {
+    background: #dcfce7;
+    color: #166534;
+  }
+}

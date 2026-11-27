@@ -1,0 +1,166 @@
+// =========================
+// Confirmación "¿Seguro que son estos niños?"
+// =========================
+:host {
+  --verde-rutas: var(--rs-color-primary, #15803d);
+}
+
+.confirmar-ninos-fondo {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+
+  background: rgba(15, 23, 42, 0.55);
+  animation: confirmar-ninos-aparece 0.15s ease-out;
+}
+
+.confirmar-ninos {
+  width: 100%;
+  max-width: 380px;
+  max-height: calc(100vh - 32px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 22px 18px 18px;
+
+  border-radius: 20px;
+  background: var(--rs-color-surface, #ffffff);
+  color: var(--rs-color-text, #1f2d2b);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.25);
+  text-align: center;
+  overflow-wrap: anywhere;
+
+  h2 {
+    margin: 10px 0 6px;
+    font-size: 19px;
+    font-weight: 800;
+  }
+}
+
+.confirmar-ninos__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+
+  border-radius: 50%;
+  background: var(--rs-color-primary-soft, #dcfce7);
+  color: var(--verde-rutas, #15803d);
+  font-size: 28px;
+}
+
+.confirmar-ninos__texto {
+  margin: 0 0 14px;
+  color: var(--rs-color-text-muted, #5c6f6c);
+  font-size: 14px;
+  line-height: 1.4;
+
+  strong {
+    color: var(--rs-color-text, #1f2d2b);
+  }
+}
+
+.confirmar-ninos__lista {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    padding: 10px 12px;
+
+    border: 1.5px solid var(--verde-rutas, #15803d);
+    border-radius: 14px;
+    background: var(--rs-color-primary-subtle, #f0fdf4);
+
+    > ion-icon {
+      flex-shrink: 0;
+      color: var(--verde-rutas, #15803d);
+      font-size: 22px;
+    }
+  }
+}
+
+.confirmar-ninos__avatar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+
+  border-radius: 50%;
+  background: var(--verde-rutas, #15803d);
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.confirmar-ninos__datos {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+
+  strong {
+    font-size: 15px;
+  }
+
+  small {
+    color: var(--rs-color-text-muted, #5c6f6c);
+    font-size: 12px;
+  }
+}
+
+.confirmar-ninos__nota {
+  margin: 0 0 14px;
+  padding: 8px 10px;
+
+  border-radius: 10px;
+  background: #fff7ed;
+  color: #9a3412;
+  font-size: 13px;
+  text-align: left;
+}
+
+.confirmar-ninos__botones {
+  display: flex;
+  gap: 10px;
+}
+
+.confirmar-ninos__btn {
+  flex: 1;
+  min-height: 46px;
+  padding: 0 12px;
+
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+
+  &--revisar {
+    border: 1.5px solid var(--verde-rutas, #15803d);
+    background: #ffffff;
+    color: var(--verde-rutas, #15803d);
+  }
+
+  &--si {
+    border: none;
+    background: var(--verde-rutas, #15803d);
+    color: #ffffff;
+  }
+}
+
+@keyframes confirmar-ninos-aparece {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

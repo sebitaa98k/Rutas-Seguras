@@ -1,0 +1,226 @@
+<ion-content [fullscreen]="true">
+
+  <div class="incident-page">
+
+    <!-- ENCABEZADO -->
+    <section class="header rs-page-header">
+
+      <div>
+
+        <span class="eyebrow">CONDUCTOR</span>
+
+        <h1>Emergencia</h1>
+
+        <p>
+
+          Reporta una situación ocurrida durante el recorrido.
+
+        </p>
+
+      </div>
+
+      <ion-menu-toggle menu="main-menu">
+
+        <button class="menu-btn rs-header-action" type="button" title="Abrir menú">
+
+          <ion-icon name="menu-outline"></ion-icon>
+
+        </button>
+
+      </ion-menu-toggle>
+
+    </section>
+
+
+    <!-- FORMULARIO -->
+    <section class="card">
+
+      <label class="section-title">
+
+        Modo de emergencia
+
+      </label>
+
+      <div class="chips">
+
+        <button
+          type="button"
+          class="chip"
+          [class.active]="tipo === 'ruta'"
+          (click)="cambiarTipo('ruta')">
+
+          Emergencia en ruta
+
+        </button>
+
+        <button
+          type="button"
+          class="chip"
+          [class.active]="tipo === 'estudiante'"
+          (click)="cambiarTipo('estudiante')">
+
+          Estudiante
+
+        </button>
+
+      </div>
+
+
+      <!-- LISTA DE ESTUDIANTES REALES (SI TIPO ES ESTUDIANTE) -->
+      @if (tipo === 'estudiante') {
+
+        <div class="field student-picker-field">
+
+          <label class="field-title">
+
+            Estudiante afectado
+
+          </label>
+
+
+          @if (cargandoEstudiantes) {
+
+            <div class="loading-students">
+
+              <ion-spinner name="crescent" color="primary"></ion-spinner>
+
+              <span>Cargando estudiantes del furgón...</span>
+
+            </div>
+
+          }
+
+
+          @if (!cargandoEstudiantes && estudiantesLista.length === 0) {
+
+            <div class="no-students-warning">
+
+              <ion-icon name="alert-circle-outline"></ion-icon>
+
+              <p>No tienes estudiantes asignados a tu furgón o ruta activa.</p>
+
+            </div>
+
+          }
+
+
+          @if (!cargandoEstudiantes && estudiantesLista.length > 0) {
+
+            <div class="student-select-list">
+
+              @for (est of estudiantesLista; track est.id) {
+
+                <div
+                  class="student-radio-item"
+                  [class.selected]="estudianteSeleccionadoId === est.id"
+                  (click)="seleccionarEstudiante(est.id)">
+
+                  <div class="radio-icon">
+
+                    <ion-icon [name]="estudianteSeleccionadoId === est.id ? 'radio-button-on-outline' : 'radio-button-off-outline'"></ion-icon>
+
+                  </div>
+
+                  <div class="student-details">
+
+                    <strong>🎓 {{ est.nombre }} {{ est.apellido }}</strong>
+
+                    @if (estadoPorEstudiante.get(est.id!); as estado) {
+                      <span class="estado-en-ruta" [class.estado-en-ruta--abordo]="estado.abordo">{{ estado.texto }}</span>
+                    }
+
+                  </div>
+
+                </div>
+
+              }
+
+            </div>
+
+          }
+
+        </div>
+
+      }
+
+
+      <!-- TIPO DE EMERGENCIA -->
+      <div class="field">
+
+        <label class="field-title">
+
+          Tipo de emergencia
+
+        </label>
+
+        <select [(ngModel)]="categoria" class="select-field">
+
+          <option value="">
+
+            [ Selecciona una opción ]
+
+          </option>
+
+          @for (opcion of tiposDisponibles; track opcion) {
+            <option [value]="opcion">{{ opcion }}</option>
+          }
+
+        </select>
+
+      </div>
+
+
+      <!-- DESCRIPCIÓN -->
+      <div class="field">
+
+        <label class="field-title">
+
+          ¿Qué ocurrió?
+
+        </label>
+
+        <textarea
+          rows="4"
+          [(ngModel)]="descripcion"
+          placeholder="Describe brevemente la situación..."
+          class="text-field">
+
+        </textarea>
+
+      </div>
+
+
+      <!-- AVISO DE NOTIFICACIÓN -->
+      <div class="notice">
+
+        <ion-icon name="warning-outline"></ion-icon>
+
+        <p>
+
+          {{ tipo === 'ruta' ? 'La emergencia en ruta será informada a los apoderados de la ruta activa.' : 'La emergencia será informada al apoderado del estudiante seleccionado.' }}
+
+        </p>
+
+      </div>
+
+
+      <!-- BOTÓN DE ENVÍO -->
+      <button
+        type="button"
+        class="send-btn"
+        [disabled]="enviando"
+        (click)="confirmarYEnviar()">
+
+        <ion-icon name="send-outline" *ngIf="!enviando"></ion-icon>
+
+        <ion-spinner name="crescent" *ngIf="enviando"></ion-spinner>
+
+        <span>{{ enviando ? 'Enviando emergencia...' : 'Enviar emergencia' }}</span>
+
+      </button>
+
+    </section>
+
+  </div>
+
+</ion-content>

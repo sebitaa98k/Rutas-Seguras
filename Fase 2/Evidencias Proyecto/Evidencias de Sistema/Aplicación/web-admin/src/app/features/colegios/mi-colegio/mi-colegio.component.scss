@@ -1,0 +1,161 @@
+.page-container {
+  padding: 1.5rem;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.25rem;
+  }
+
+  .subtitle {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+}
+
+.estado {
+  color: #64748b;
+
+  &.error {
+    color: #b91c1c;
+  }
+}
+
+.tarjeta {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.colegio-encabezado,
+.sede-encabezado {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+
+  h2,
+  h3 {
+    margin: 0;
+    color: #0f172a;
+  }
+}
+
+.rbd {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.plan-pill,
+.principal-pill {
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0;
+
+  dt {
+    font-size: 0.75rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  dd {
+    margin: 0.25rem 0 0;
+    color: #0f172a;
+  }
+}
+
+.sedes {
+  margin-top: 1.75rem;
+
+  h2 {
+    font-size: 1.15rem;
+    color: #0f172a;
+    margin: 0 0 0.75rem;
+  }
+}
+
+.sedes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.sede-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  input {
+    padding: 0.5rem 0.65rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+  }
+
+  > button {
+    align-self: flex-start;
+  }
+}
+
+.sede-dato {
+  margin: 0;
+  color: #334155;
+  font-size: 0.9rem;
+}
+
+.sede-label {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.sede-nota {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.8rem;
+}
+
+.acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+
+/* Tamaño y forma de los botones (el color sale de .rs-btn--primary / --secondary). */
+.btn {
+  padding: 0.6rem 1.15rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  min-height: 40px;
+  width: fit-content;
+}
+
+.sede-card .btn {
+  padding: 0.45rem 0.95rem;
+  font-size: 0.85rem;
+  min-height: 36px;
+}
+
+.acciones {
+  margin-top: 0.25rem;
+}

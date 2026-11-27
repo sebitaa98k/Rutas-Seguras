@@ -1,0 +1,121 @@
+<div class="list-page fade-in">
+  <div class="list-header">
+    <div>
+      <h2>Papelera</h2>
+      <p>
+        Nada se borra del sistema: lo que se desactiva queda aquí y se puede reactivar.
+        Lo desactivado no aparece en las listas ni puede ingresar, pero su historial sigue en Auditoría y Reportes.
+      </p>
+    </div>
+  </div>
+
+  @if (aviso) {
+    <p class="mensaje ok">{{ aviso }}</p>
+  }
+  @if (error) {
+    <p class="mensaje error">{{ error }}</p>
+  }
+
+  @if (cargando && !grupos.length) {
+    <p class="vacio">Cargando…</p>
+  } @else {
+    <div class="pestanas" role="tablist">
+      @for (grupo of grupos; track grupo.tipo) {
+        <button
+          type="button"
+          role="tab"
+          class="pestana"
+          [class.activa]="grupo.tipo === tipoActivo"
+          [attr.aria-selected]="grupo.tipo === tipoActivo"
+          (click)="tipoActivo = grupo.tipo"
+        >
+          {{ grupo.titulo }}
+          <span class="contador" [class.vacio-contador]="!grupo.items.length">{{ grupo.items.length }}</span>
+        </button>
+      }
+    </div>
+
+    <div class="glass-panel rs-card">
+      @if (!grupoActivo?.items?.length) {
+        <p class="vacio">No hay {{ (grupoActivo?.titulo || 'elementos') | lowercase }} desactivados.</p>
+      } @else {
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Detalle</th>
+              <th>Desactivado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of grupoActivo!.items; track clave(item)) {
+              <tr>
+                <td>
+                  <strong>{{ item.nombre }}</strong>
+                  @if (item.puede_mover) {
+                    <small class="nota-sede-cerrada">Su sede se cerró al cambiar el plan del colegio</small>
+                  }
+                </td>
+                <td>{{ item.detalle }}</td>
+                <td>{{ item.desactivado_en ? (item.desactivado_en | date: 'dd/MM/yyyy HH:mm') : '—' }}</td>
+                <td class="acciones">
+                  @if (item.puede_mover) {
+                    <!-- Quedó en una sede que se cerró al bajar de plan: vuelve al colegio, no a esa sede. -->
+                    <button
+                      type="button"
+                      class="rs-btn rs-btn--primary"
+                      title="Su sede se cerró al cambiar el plan del colegio"
+                      [disabled]="reactivando.has(clave(item))"
+                      (click)="moverAlColegio(item)"
+                    >
+                      {{ reactivando.has(clave(item)) ? 'Moviendo…' : 'Mover al colegio' }}
+                    </button>
+                  } @else {
+                    <button
+                      type="button"
+                      class="rs-btn rs-btn--primary"
+                      [disabled]="reactivando.has(clave(item))"
+                      (click)="reactivar(item)"
+                    >
+                      {{ reactivando.has(clave(item)) ? 'Reactivando…' : 'Reactivar' }}
+                    </button>
+                  }
+                  <button type="button" class="rs-btn btn-eliminar" (click)="pedirEliminar(item)">
+                    Eliminar definitivamente
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    </div>
+
+    @if (!total) {
+      <p class="vacio">La papelera está vacía.</p>
+    }
+  }
+
+  @if (porEliminar) {
+    <div class="confirmar-fondo" (click)="cancelarEliminar()">
+      <div class="confirmar-caja" role="dialog" aria-modal="true" aria-labelledby="titulo-eliminar" (click)="$event.stopPropagation()">
+        <h3 id="titulo-eliminar">Eliminar definitivamente</h3>
+        <p>
+          Vas a eliminar <strong>{{ porEliminar.nombre }}</strong> para siempre. Ya no se podrá reactivar.
+        </p>
+        <p class="nota">Si tiene historial de recorridos, el sistema no lo eliminará para no perder la evidencia de Auditoría.</p>
+        <label class="seguro">
+          <input type="checkbox" [checked]="confirmaEliminar" (change)="confirmaEliminar = $any($event.target).checked" />
+          Entiendo que esto no se puede deshacer
+        </label>
+        <div class="confirmar-acciones">
+          <button type="button" class="rs-btn rs-btn--secondary" [disabled]="eliminando" (click)="cancelarEliminar()">Cancelar</button>
+          <button type="button" class="rs-btn btn-eliminar" [disabled]="!confirmaEliminar || eliminando" (click)="aceptarEliminar()">
+            {{ eliminando ? 'Eliminando…' : 'Aceptar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

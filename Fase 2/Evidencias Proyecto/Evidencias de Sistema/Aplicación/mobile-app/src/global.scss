@@ -1,0 +1,467 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+@import "leaflet/dist/leaflet.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+:root {
+  color-scheme: light;
+  --ion-background-color: #ffffff;
+  --ion-background-color-rgb: 255, 255, 255;
+  --ion-text-color: #172321;
+  --ion-text-color-rgb: 23, 35, 33;
+}
+
+ion-alert,
+ion-action-sheet,
+ion-modal,
+ion-popover {
+  --ion-background-color: #ffffff;
+  --ion-text-color: #172321;
+}
+
+/* ==========================================================================
+   RUTAS SEGURAS - SHELL Y CABECERAS
+   ========================================================================== */
+
+:root {
+  --rs-page-padding-inline: var(--rs-space-4);
+  --rs-page-padding-top: var(--rs-space-5);
+  --rs-page-padding-bottom: var(--rs-space-8);
+  --rs-header-min-height: 56px;
+  --rs-bottom-nav-height: 72px;
+}
+
+.rs-page-header,
+.rs-detail-header {
+  width: 100%;
+  min-height: var(--rs-header-min-height);
+  display: flex;
+  align-items: center;
+  gap: var(--rs-space-3);
+  margin-bottom: var(--rs-space-6);
+  color: var(--rs-color-text);
+}
+
+.rs-page-header {
+  justify-content: space-between;
+}
+
+.rs-detail-header {
+  justify-content: flex-start;
+}
+
+.rs-page-header h1,
+.rs-detail-header h1 {
+  margin: 0;
+  color: var(--rs-color-text);
+  font-family: var(--rs-font-family);
+  font-size: var(--rs-font-size-xl);
+  font-weight: var(--rs-font-weight-extrabold);
+  line-height: var(--rs-line-height-tight);
+  letter-spacing: -0.02em;
+}
+
+.rs-page-header > :first-child:not(.rs-header-action),
+.rs-detail-header > :not(.rs-header-action) {
+  min-width: 0;
+}
+
+.rs-header-action {
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 44px !important;
+  padding: 0 !important;
+  border: 1px solid var(--rs-color-border) !important;
+  border-radius: var(--rs-radius-md) !important;
+  background: var(--rs-color-surface) !important;
+  color: var(--rs-color-primary) !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  transition: background var(--rs-transition-fast), color var(--rs-transition-fast),
+    transform var(--rs-transition-fast) !important;
+}
+
+.rs-header-action:hover {
+  background: var(--rs-color-primary-soft) !important;
+}
+
+.rs-header-action:active {
+  transform: scale(0.97) !important;
+}
+
+.rs-header-action:focus-visible {
+  outline: none;
+  box-shadow: var(--rs-focus-ring) !important;
+}
+
+.rs-header-action ion-icon {
+  font-size: 21px !important;
+}
+
+.rs-authenticated-shell {
+  --rs-shell-content-bottom: calc(
+    var(--rs-bottom-nav-height) + env(safe-area-inset-bottom)
+  );
+}
+
+@media (min-width: 600px) {
+  :root {
+    --rs-page-padding-inline: var(--rs-space-6);
+    --rs-page-padding-top: var(--rs-space-6);
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --rs-page-padding-inline: var(--rs-space-3);
+    --rs-page-padding-top: var(--rs-space-4);
+  }
+
+  .rs-page-header,
+  .rs-detail-header {
+    gap: var(--rs-space-2);
+    margin-bottom: var(--rs-space-5);
+  }
+
+  .rs-page-header h1,
+  .rs-detail-header h1 {
+    font-size: 1.375rem;
+  }
+}
+
+/* ==========================================================================
+   RUTAS SEGURAS - FORMULARIOS Y FEEDBACK
+   Clases opt-in para mantener compatibles las pantallas aún no migradas.
+   ========================================================================== */
+
+.rs-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rs-space-4);
+}
+
+.rs-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rs-space-2);
+  margin: 0;
+}
+
+.rs-field__label {
+  color: var(--rs-color-text);
+  font-size: var(--rs-font-size-sm);
+  font-weight: var(--rs-font-weight-semibold);
+  line-height: var(--rs-line-height-base);
+}
+
+.rs-field__required {
+  color: var(--rs-color-danger);
+}
+
+.rs-control {
+  --background: var(--rs-color-surface);
+  --color: var(--rs-color-text);
+  --placeholder-color: var(--rs-color-text-soft);
+  --padding-start: var(--rs-control-padding-inline);
+  --padding-end: var(--rs-control-padding-inline);
+  --inner-padding-end: 0;
+  --highlight-color-focused: transparent;
+  min-height: var(--rs-control-height);
+  margin: 0;
+  border: 1px solid var(--rs-input-border);
+  border-radius: var(--rs-input-radius);
+  background: var(--rs-color-surface);
+  color: var(--rs-color-text);
+  transition: border-color var(--rs-transition-fast), box-shadow var(--rs-transition-fast),
+    background var(--rs-transition-fast);
+}
+
+.rs-control:focus-within {
+  border-color: var(--rs-color-primary);
+  box-shadow: var(--rs-focus-ring);
+}
+
+.rs-control.rs-control--invalid,
+.rs-field[aria-invalid="true"] .rs-control {
+  border-color: var(--rs-color-danger);
+}
+
+.rs-control.rs-control--invalid:focus-within,
+.rs-field[aria-invalid="true"] .rs-control:focus-within {
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--rs-color-danger) 18%, transparent);
+}
+
+.rs-control[disabled],
+.rs-control.ion-disabled,
+.rs-field--disabled .rs-control {
+  --background: var(--rs-color-surface-soft);
+  --color: var(--rs-color-text-soft);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.rs-control.rs-control--readonly,
+.rs-control:has([readonly]) {
+  --background: var(--rs-color-primary-subtle);
+  background: var(--rs-color-primary-subtle);
+}
+
+.rs-control ion-input,
+.rs-control ion-select,
+.rs-control ion-textarea {
+  --color: var(--rs-color-text);
+  --placeholder-color: var(--rs-color-text-soft);
+  font-family: var(--rs-font-family);
+  font-size: var(--rs-font-size-base);
+}
+
+.rs-control ion-input-password-toggle {
+  color: var(--rs-color-primary);
+}
+
+.rs-field__help,
+.rs-field__error {
+  margin: 0;
+  font-size: var(--rs-font-size-xs);
+  line-height: var(--rs-line-height-base);
+}
+
+.rs-field__help {
+  color: var(--rs-color-text-muted);
+}
+
+.rs-field__error {
+  color: var(--rs-color-danger);
+}
+
+.rs-button {
+  --border-radius: var(--rs-button-radius);
+  --box-shadow: none;
+  min-height: var(--rs-control-height);
+  margin: 0;
+  font-family: var(--rs-font-family);
+  font-size: var(--rs-font-size-md);
+  font-weight: var(--rs-font-weight-semibold);
+  text-transform: none;
+}
+
+.rs-button--primary {
+  --background: var(--rs-color-primary);
+  --background-hover: var(--rs-color-primary-hover);
+  --background-activated: var(--rs-color-primary-hover);
+  --color: var(--rs-color-surface);
+}
+
+.rs-button--secondary {
+  --background: var(--rs-color-primary-soft);
+  --background-hover: var(--rs-color-primary-subtle);
+  --background-activated: var(--rs-color-primary-subtle);
+  --color: var(--rs-color-primary-hover);
+  --border-color: var(--rs-color-border);
+  --border-style: solid;
+  --border-width: 1px;
+}
+
+.rs-button--tertiary {
+  --background: transparent;
+  --background-hover: var(--rs-color-primary-subtle);
+  --background-activated: var(--rs-color-primary-soft);
+  --color: var(--rs-color-primary);
+}
+
+.rs-button--danger {
+  --background: var(--rs-color-danger);
+  --background-hover: var(--rs-color-danger);
+  --background-activated: var(--rs-color-danger);
+  --border-color: var(--rs-color-danger);
+  --border-style: solid;
+  --border-width: 1px;
+  --color: var(--rs-color-surface);
+}
+
+.rs-button--danger ion-icon {
+  color: var(--rs-color-surface);
+}
+
+.rs-button--danger:focus-visible {
+  outline: none;
+  box-shadow: var(--rs-focus-ring);
+}
+
+.rs-button[disabled] {
+  opacity: 0.55;
+}
+
+button.rs-button {
+  min-height: var(--rs-control-height);
+  padding: 0 var(--rs-space-5);
+  border: 0;
+  border-radius: var(--rs-button-radius);
+  cursor: pointer;
+}
+
+button.rs-button--primary {
+  background: var(--rs-color-primary);
+  color: var(--rs-color-surface);
+}
+
+button.rs-button--primary:hover {
+  background: var(--rs-color-primary-hover);
+}
+
+.rs-feedback {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rs-space-3);
+  padding: var(--rs-space-3) var(--rs-space-4);
+  border: 1px solid var(--rs-color-border);
+  border-radius: var(--rs-radius-md);
+  font-size: var(--rs-font-size-sm);
+  line-height: var(--rs-line-height-base);
+}
+
+.rs-feedback--success {
+  border-color: var(--rs-color-success);
+  background: var(--rs-color-success-soft);
+  color: var(--rs-color-success);
+}
+
+.rs-feedback--warning {
+  border-color: var(--rs-color-warning);
+  background: var(--rs-color-warning-soft);
+  color: var(--rs-color-warning);
+}
+
+.rs-feedback--danger {
+  border-color: var(--rs-color-danger);
+  background: var(--rs-color-danger-soft);
+  color: var(--rs-color-danger);
+}
+
+.rs-feedback--info {
+  border-color: var(--rs-color-info);
+  background: var(--rs-color-info-soft);
+  color: var(--rs-color-info);
+}
+
+.rs-screen-state {
+  width: min(100%, 420px);
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rs-space-3);
+  margin: auto;
+  padding: var(--rs-space-8) var(--rs-space-5);
+  text-align: center;
+  color: var(--rs-color-text-muted);
+}
+
+.rs-screen-state__icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--rs-radius-lg);
+  background: var(--rs-color-primary-soft);
+  color: var(--rs-color-primary);
+  font-size: 28px;
+}
+
+.rs-screen-state--error .rs-screen-state__icon {
+  background: var(--rs-color-danger-soft);
+  color: var(--rs-color-danger);
+}
+
+.rs-screen-state--success .rs-screen-state__icon {
+  background: var(--rs-color-success-soft);
+  color: var(--rs-color-success);
+}
+
+.rs-screen-state h2,
+.rs-screen-state p {
+  margin: 0;
+}
+
+.rs-screen-state h2 {
+  color: var(--rs-color-text);
+  font-size: var(--rs-font-size-lg);
+  font-weight: var(--rs-font-weight-bold);
+}
+
+.rs-screen-state p {
+  max-width: 34ch;
+  font-size: var(--rs-font-size-md);
+  line-height: var(--rs-line-height-base);
+}
+
+ion-toast.rs-toast {
+  --border-radius: var(--rs-radius-md);
+  --box-shadow: var(--rs-shadow-raised);
+  font-family: var(--rs-font-family);
+  font-size: var(--rs-font-size-sm);
+  font-weight: var(--rs-font-weight-medium);
+}
+
+ion-alert.rs-alert .alert-wrapper {
+  border-radius: var(--rs-radius-lg);
+  background: var(--rs-color-surface);
+  box-shadow: var(--rs-shadow-raised);
+}
+
+ion-alert.rs-alert .alert-title {
+  color: var(--rs-color-text);
+  font-weight: var(--rs-font-weight-bold);
+}
+
+ion-alert.rs-alert .alert-message {
+  color: var(--rs-color-text-muted);
+  line-height: var(--rs-line-height-base);
+}
+
+ion-alert.rs-alert .alert-button {
+  color: var(--rs-color-primary);
+  font-weight: var(--rs-font-weight-semibold);
+}
+
+ion-alert.rs-alert .alert-button.rs-alert__danger {
+  color: var(--rs-color-danger);
+}

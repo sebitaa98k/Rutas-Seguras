@@ -1,0 +1,86 @@
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1>Mi colegio</h1>
+      <p class="subtitle">Información de tu establecimiento{{ colegio()?.es_multisede ? ' y sus sedes' : '' }}.</p>
+    </div>
+  </div>
+
+  @if (cargando()) {
+    <p class="estado">Cargando...</p>
+  } @else if (error() && !colegio()) {
+    <p class="estado error" role="alert">{{ error() }}</p>
+  } @else if (colegio(); as c) {
+    <section class="tarjeta colegio-card">
+      <div class="colegio-encabezado">
+        <div>
+          <h2>{{ c.nombre }}</h2>
+          @if (c.rbd) {
+            <span class="rbd">RBD {{ c.rbd }}</span>
+          }
+        </div>
+        <span class="plan-pill">Plan {{ c.plan_nombre || 'Básico' }}</span>
+      </div>
+
+      <dl class="datos">
+        <div>
+          <dt>Dirección</dt>
+          <dd>{{ c.direccion || '—' }}{{ c.comuna ? ', ' + c.comuna : '' }}</dd>
+        </div>
+        <div>
+          <dt>Teléfono</dt>
+          <dd>{{ c.telefono || '—' }}</dd>
+        </div>
+        <div>
+          <dt>Correo de contacto</dt>
+          <dd>{{ c.email_contacto || '—' }}</dd>
+        </div>
+      </dl>
+
+      <a class="btn btn-primary rs-btn rs-btn--primary " [routerLink]="['/colegios/editar', c.id]">Editar datos de contacto</a>
+    </section>
+
+    @if (c.es_multisede) {
+      <section class="sedes">
+        <h2>Sedes</h2>
+        @if (error()) {
+          <p class="estado error" role="alert">{{ error() }}</p>
+        }
+        <div class="sedes-grid">
+          @for (sede of sedes(); track sede.id) {
+            <article class="tarjeta sede-card">
+              <div class="sede-encabezado">
+                <h3>{{ sede.nombre }}</h3>
+                @if (sede.es_principal) {
+                  <span class="principal-pill">Principal</span>
+                }
+              </div>
+              <p class="sede-dato">{{ sede.direccion || '—' }}{{ sede.comuna ? ', ' + sede.comuna : '' }}</p>
+
+              @if (editandoId() === sede.id) {
+                <label class="sede-label" [for]="'telefono-' + sede.id">Teléfono</label>
+                <input [id]="'telefono-' + sede.id" type="tel" [(ngModel)]="telefono" name="telefono" maxlength="50">
+                <div class="acciones">
+                  <button type="button" class="btn btn-secondary rs-btn rs-btn--secondary" (click)="cancelar()" [disabled]="guardando()">Cancelar</button>
+                  <button type="button" class="btn btn-primary rs-btn rs-btn--primary" (click)="guardarTelefono(sede)" [disabled]="guardando()">
+                    {{ guardando() ? 'Guardando...' : 'Guardar' }}
+                  </button>
+                </div>
+              } @else {
+                <p class="sede-dato">Teléfono: {{ sede.telefono || '—' }}</p>
+                @if (sede.inspectores?.length) {
+                  <p class="sede-dato">Inspectores: {{ nombresInspectores(sede) }}</p>
+                }
+                @if (sede.es_principal) {
+                  <p class="sede-nota">Usa los datos del colegio: se cambian en "Editar datos de contacto".</p>
+                } @else {
+                  <button type="button" class="btn btn-secondary rs-btn rs-btn--secondary" (click)="editarTelefono(sede)">Editar</button>
+                }
+              }
+            </article>
+          }
+        </div>
+      </section>
+    }
+  }
+</div>

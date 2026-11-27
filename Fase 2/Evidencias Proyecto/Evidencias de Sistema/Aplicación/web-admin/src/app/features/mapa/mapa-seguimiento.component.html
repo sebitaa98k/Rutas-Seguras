@@ -1,0 +1,40 @@
+<div class="modal-overlay" (click)="cerrarModal($event)">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="header-info">
+        @if (enRecorrido()) {
+          <span class="live-badge"><span class="badge-dot"></span> EN VIVO</span>
+        }
+        <h3>Seguimiento de Ruta</h3>
+        <p class="subtitle">
+          {{ rutaNombre || 'Ruta Escolar' }}
+          @if (ultimaActualizacion()) {
+            · GPS actualizado {{ ultimaActualizacion() | date: 'HH:mm:ss' }}
+          } @else if (!cargando()) {
+            · Esperando la primera posición GPS del conductor
+          }
+        </p>
+      </div>
+      <button type="button" class="close-btn" (click)="cerrarModal($event)" aria-label="Cerrar">&times;</button>
+    </div>
+
+    @if (error()) {
+      <p class="map-error">{{ error() }}</p>
+    }
+
+    @if (terminadaEn()) {
+      <p class="map-aviso">
+        <strong>Ruta terminada</strong> a las {{ terminadaEn() | date: 'HH:mm' }}. El furgón ya no está en recorrido;
+        el detalle de quién subió y quién fue entregado está en Auditoría.
+      </p>
+    } @else if (!cargando() && !enRecorrido()) {
+      <p class="map-aviso">Esta ruta no está en recorrido. El mapa muestra sus paradas.</p>
+    }
+
+    <div class="map-wrapper">
+      <div id="mapa"></div>
+    </div>
+
+  </div>
+</div>

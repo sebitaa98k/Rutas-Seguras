@@ -1,0 +1,88 @@
+<div class="selector-ubicacion">
+  <div class="geo-territorio">
+    <div class="geo-campo">
+      <label>Región{{ requerido ? ' *' : '' }}</label>
+      <select
+        [class.invalid]="invalido && !regionSeleccionada()"
+        [ngModel]="regionSeleccionada()"
+        (ngModelChange)="regionElegida($event)">
+        <option value="">-- Selecciona región --</option>
+        @for (region of regiones; track region) {
+          <option [value]="region">{{ region }}</option>
+        }
+      </select>
+    </div>
+    <div class="geo-campo">
+      <label>Comuna{{ requerido ? ' *' : '' }}</label>
+      @if (comunasDisponibles.length) {
+        <select
+          [class.invalid]="invalido && !comunaSeleccionada()"
+          [ngModel]="comunaSeleccionada()"
+          (ngModelChange)="comunaElegida($event)">
+          <option value="">-- Selecciona comuna --</option>
+          @for (comuna of comunasDisponibles; track comuna) {
+            <option [value]="comuna">{{ comuna }}</option>
+          }
+        </select>
+      } @else {
+        <input
+          type="text"
+          placeholder="Escribe la comuna"
+          [class.invalid]="invalido && !comunaSeleccionada()"
+          [disabled]="!regionSeleccionada()"
+          [ngModel]="comunaSeleccionada()"
+          (ngModelChange)="comunaElegida($event)"
+        />
+      }
+    </div>
+  </div>
+
+  <label>{{ etiqueta }} (calle y número){{ requerido ? ' *' : '' }}</label>
+  <input
+    type="text"
+    [placeholder]="placeholder"
+    [class.invalid]="invalido && !textoDireccion().trim()"
+    [ngModel]="textoDireccion()"
+    (ngModelChange)="direccionEscrita($event)"
+  />
+
+  <div class="geo-actions">
+    <button type="button" class="btn-geo" (click)="buscar()" [disabled]="buscando()">
+      {{ buscando() ? 'Buscando...' : 'Buscar dirección' }}
+    </button>
+    <button type="button" class="btn-geo-manual" (click)="abrirMapaManual()">
+      Elegir en el mapa
+    </button>
+    @if (tienePunto) {
+      <button type="button" class="btn-geo-quitar" (click)="quitarPunto()">Quitar punto</button>
+    }
+  </div>
+
+  @if (faltaNumeracion) {
+    <small class="geo-warning">Incluye la numeración (y depto o casa si corresponde): el conductor la necesita para saber cuál es la casa.</small>
+  }
+
+  @if (mensaje()) {
+    <small class="geo-message">{{ mensaje() }}</small>
+  }
+
+  @if (coincidencias().length) {
+    <div class="geo-results">
+      @for (opcion of coincidencias(); track opcion.nombreCompleto) {
+        <button type="button" (click)="seleccionar(opcion)">{{ opcion.nombreCompleto }}</button>
+      }
+    </div>
+  }
+
+  @if (tienePunto) {
+    <small class="geo-summary">
+      Punto: {{ lat() }}, {{ lng() }} · Arrastra el marcador o haz clic en el mapa para moverlo.
+    </small>
+    @if (referenciaMapa()) {
+      <small class="geo-summary">Referencia del buscador: {{ referenciaMapa() }}</small>
+    }
+    <div #contenedorMapa class="geo-map"></div>
+  } @else {
+    <small class="geo-pending">Sin punto en el mapa todavía.</small>
+  }
+</div>

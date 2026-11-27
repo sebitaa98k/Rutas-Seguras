@@ -1,0 +1,259 @@
+<ion-content [fullscreen]="true">
+
+  <div class="facial-page">
+
+    <!-- =================================
+         CABECERA / NAVBAR
+    ================================== -->
+    <header class="page-header rs-detail-header">
+
+      <button type="button" class="icon-btn back-btn rs-header-action" (click)="volverARuta()" title="Volver a la ruta activa">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+
+      <div class="header-titles">
+        <span class="section-label">RUTAS SEGURAS</span>
+        <h1>Escaneo Facial</h1>
+      </div>
+
+      <ion-menu-toggle menu="main-menu">
+        <button type="button" class="icon-btn menu-btn rs-header-action" title="Abrir menú">
+          <ion-icon name="menu-outline"></ion-icon>
+        </button>
+      </ion-menu-toggle>
+
+    </header>
+
+
+    <!-- =================================
+         ACCIÓN DEL ESCANEO (LA DEFINE LA RUTA)
+    ================================== -->
+    <section class="mode-selector-card">
+
+      <span class="mode-title">{{ tipoAccion === 'entregar' ? 'ENTREGA' : 'SUBIDA' }}{{ estudianteNombre ? ' DE ' + estudianteNombre : '' }}</span>
+
+      <p class="mode-hint" *ngIf="tipoAccion === 'abordar'">
+        Ubica el rostro del estudiante dentro del marco para registrar su abordaje.
+      </p>
+
+      <p class="mode-hint" *ngIf="tipoAccion === 'entregar'">
+        Ubica el rostro del estudiante dentro del marco para registrar su entrega.
+      </p>
+
+    </section>
+
+
+    <!-- =================================
+         VISOR DE CÁMARA BIOMÉTRICA
+    ================================== -->
+    <section class="camera-section" *ngIf="!confirmado">
+
+      <div class="camera-viewport">
+
+        <!-- Animación de Rayo Escáner -->
+        <div class="scan-beam" *ngIf="camaraActiva && !resultadoBackend && !procesandoEscaneo"></div>
+
+        <!-- Malla / Retícula Biométrica -->
+        <div class="biometric-grid" *ngIf="camaraActiva"></div>
+
+        <!-- Marco de Encuadre Facial -->
+        <div class="face-target-box" [class.success]="resultadoBackend?.coincidencia"
+          [class.danger]="resultadoBackend && !resultadoBackend.coincidencia">
+          <div class="corner top-left"></div>
+          <div class="corner top-right"></div>
+          <div class="corner bottom-left"></div>
+          <div class="corner bottom-right"></div>
+          <span class="target-label" *ngIf="camaraActiva && !procesandoEscaneo && !resultadoBackend">Ubica el rostro aquí</span>
+        </div>
+
+        <button type="button" class="switch-camera-btn" *ngIf="camaraActiva && !resultadoBackend"
+          title="Cambiar cámara" aria-label="Cambiar cámara"
+          [disabled]="cargandoCamara || procesandoEscaneo" (click)="alternarCamara()">
+          <ion-icon name="camera-reverse-outline"></ion-icon>
+        </button>
+
+        <!-- Video de Cámara Web real -->
+        <video #videoElement playsinline autoplay muted class="video-feed" [class.hidden]="!camaraActiva"></video>
+
+        <!-- Canvas oculto para captura de fotogramas -->
+        <canvas #canvasElement style="display: none;"></canvas>
+
+        <!-- Cargando cámara -->
+        <div class="camera-loading" *ngIf="cargandoCamara">
+          <ion-spinner name="crescent"></ion-spinner>
+          <p>Preparando cámara...</p>
+        </div>
+
+        <!-- Error acceso cámara -->
+        <div class="camera-error" *ngIf="errorCamara">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          <p>{{ errorCamara }}</p>
+          <button type="button" class="retry-cam-btn" (click)="iniciarCamara()">Reintentar Cámara</button>
+        </div>
+
+      </div>
+
+      <!-- BOTÓN DE CAPTURA Y ANÁLISIS REAL -->
+      <div class="action-bar" *ngIf="camaraActiva && !resultadoBackend">
+
+        <button type="button" class="scan-action-btn" [disabled]="procesandoEscaneo"
+          (click)="capturarYProcesarRostro()">
+
+          <span *ngIf="!procesandoEscaneo" class="btn-content">
+            <ion-icon name="scan-outline"></ion-icon>
+            Escanear rostro
+          </span>
+
+          <span *ngIf="procesandoEscaneo" class="btn-content">
+            <ion-spinner name="crescent"></ion-spinner>
+            Verificando rostro...
+          </span>
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================
+         PANEL DE RESULTADO BIOMÉTRICO REAL
+    ================================== -->
+    <p class="last-boarding" *ngIf="subidaGeneral && ultimaSubida && !resultadoBackend">
+      <ion-icon name="checkmark-circle-outline"></ion-icon>
+      {{ ultimaSubida }} Puedes escanear al siguiente.
+    </p>
+
+    <section class="result-section" *ngIf="resultadoBackend">
+
+      <!-- CASO 1: COINCIDENCIA ENCONTRADA -->
+      <div class="result-card success-card" *ngIf="resultadoBackend.coincidencia">
+
+        <div class="result-header">
+          <div class="badge success-badge">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            ROSTRO IDENTIFICADO (SIMILITUD: {{ resultadoBackend.similitud_porcentaje }}%)
+          </div>
+        </div>
+
+        <div class="person-details">
+
+          <div class="avatar-box">
+            <ion-icon name="person-outline"></ion-icon>
+          </div>
+
+          <div class="details-text">
+            <h3>{{ resultadoBackend.nombre_identificado }}</h3>
+            <p class="rut-tag">RUT: {{ resultadoBackend.rut_identificado || 'Registrado' }}</p>
+            <span class="role-chip">{{ resultadoBackend.relacion || resultadoBackend.tipo_identificado }}</span>
+
+            <div class="student-link" *ngIf="resultadoBackend.estudiante_nombre">
+              <span>Estudiante: <strong>{{ resultadoBackend.estudiante_nombre }}</strong></span>
+              <span>Colegio: {{ resultadoBackend.colegio }} · {{ resultadoBackend.curso }}</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="card-actions" *ngIf="subidaGeneral && !resultadoBackend.evento_registrado">
+          <button type="button" class="retry-btn danger-retry" [disabled]="procesandoEscaneo" (click)="noEsEl()">
+            <ion-icon name="close-circle-outline"></ion-icon>
+            No es él
+          </button>
+          <button type="button" class="confirm-btn" [disabled]="procesandoEscaneo" (click)="confirmarSubida()">
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            {{ procesandoEscaneo ? 'Registrando...' : 'Confirmar' }}
+          </button>
+        </div>
+
+        <!-- Abordaje registrado automáticamente: "Juan subió. Siguiente: Pepito." -->
+        <div class="boarding-result" *ngIf="resultadoBackend.abordaje as abordaje"
+          [class.outside-home]="abordaje.fuera_de_domicilio || abordaje.tenia_aviso_inasistencia">
+          <ion-icon [name]="abordaje.fuera_de_domicilio ? 'alert-circle-outline' : 'checkmark-done-circle-outline'"></ion-icon>
+          <h4>{{ abordaje.ya_registrado ? abordaje.estudiante_nombre + ' ya estaba a bordo' : abordaje.estudiante_nombre + ' subió' }}</h4>
+          <p *ngIf="abordaje.tenia_aviso_inasistencia">
+            Su apoderado había avisado que hoy no usaría el furgón: el aviso se anuló y se le notificó que subió.
+          </p>
+          <p *ngIf="abordaje.fuera_de_domicilio && !abordaje.ya_registrado && !abordaje.tenia_aviso_inasistencia">
+            No era el siguiente en la ruta: se avisó a su apoderado que subió fuera de su domicilio y su parada se quitó del recorrido.
+          </p>
+          <p class="next-up" *ngIf="abordaje.siguiente_parada">
+            Ahora, siguiente: <strong>{{ abordaje.siguiente_parada.estudiante_nombre }}</strong>
+            <span>{{ abordaje.siguiente_parada.direccion }}</span>
+          </p>
+          <p class="next-up" *ngIf="abordaje.todas_completadas">
+            <strong>Dirigiéndose al colegio</strong>
+          </p>
+          <button type="button" class="finish-btn" (click)="volverARuta()">
+            Volver a la ruta ahora
+          </button>
+          <small>Volviendo a la ruta automáticamente...</small>
+        </div>
+
+        <!-- Entrega registrada automáticamente -->
+        <div class="boarding-result" *ngIf="resultadoBackend.entrega as entrega">
+          <ion-icon name="checkmark-done-circle-outline"></ion-icon>
+          <h4>{{ entrega.estudiante_nombre }} entregado</h4>
+          <p>{{ entrega.mensaje }}</p>
+          <button type="button" class="finish-btn" (click)="volverARuta()">
+            Volver a la ruta ahora
+          </button>
+          <small>Volviendo a la ruta automáticamente...</small>
+        </div>
+
+      </div>
+
+
+      <!-- CASO 2: SIN COINCIDENCIA / ROSTRO NO IDENTIFICADO -->
+      <div class="result-card danger-card" *ngIf="!resultadoBackend.coincidencia">
+
+        <div class="result-header">
+          <div class="badge danger-badge">
+            <ion-icon name="close-circle-outline"></ion-icon>
+            ROSTRO NO IDENTIFICADO
+          </div>
+        </div>
+
+        <div class="error-details">
+          <h3 *ngIf="resultadoBackend.requiere_verificacion_alternativa">
+            No pudimos confirmar la identidad
+          </h3>
+          <p class="error-msg">{{ resultadoBackend.mensaje }}</p>
+          <p class="security-note">
+            Por seguridad, solo se verifican estudiantes de tu ruta activa.
+          </p>
+        </div>
+
+        <div class="card-actions">
+          <button type="button" class="retry-btn danger-retry" (click)="resetearEscaneo()">
+            <ion-icon name="refresh-outline"></ion-icon>
+            Reintentar reconocimiento
+          </button>
+
+          <button *ngIf="resultadoBackend.requiere_verificacion_alternativa" type="button" class="confirm-btn"
+            (click)="usarCodigoQR()">
+            <ion-icon name="scan-outline"></ion-icon>
+            {{ subidaGeneral ? 'Elegir niño y usar QR del inspector' : (tipoAccion === 'entregar' ? 'Validar entrega con QR' : (rutaId ? 'Validación institucional' : 'Validar subida con QR')) }}{{ estudianteNombre ? ' de ' + estudianteNombre : '' }}
+          </button>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- FOOTER NAV -->
+    <div class="footer-nav">
+      <button type="button" class="secondary-btn" (click)="volverARuta()">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+        {{ subidaGeneral ? 'Volver a la lista' : 'Volver a la Ruta' }}
+      </button>
+    </div>
+
+  </div>
+
+  <ion-toast [isOpen]="mostrarToast" [message]="mensajeToast" [duration]="3000" [color]="colorToast"
+    (didDismiss)="mostrarToast = false">
+  </ion-toast>
+
+</ion-content>

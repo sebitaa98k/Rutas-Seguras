@@ -1,0 +1,120 @@
+<div class="modal-backdrop rs-modal-overlay" (click)="cerrar()">
+  <div class="modal-card rs-modal-surface" (click)="$event.stopPropagation()">
+    <!-- Header Modal -->
+    <div class="modal-header rs-modal-header">
+      <div>
+        <h2>Cuentas Administrativas — {{ colegio.nombre }}</h2>
+        <p class="subtitle">Administra las cuentas de los administradores de este colegio.</p>
+      </div>
+      <button class="close-btn" (click)="cerrar()" title="Cerrar">✕</button>
+    </div>
+
+    <!-- Contenido Modal -->
+    <div class="modal-body rs-modal-body">
+      <!-- Mensajes de feedback -->
+      @if (mensajeError()) {
+        <div class="alert alert-danger">{{ mensajeError() }}</div>
+      }
+      @if (mensajeExito()) {
+        <div class="alert alert-success">{{ mensajeExito() }}</div>
+      }
+
+      <!-- Formulario para agregar nuevo Admin Colegio -->
+      <div class="form-section">
+        @if (editandoId()) {
+          <h3>Editar Administrador de Colegio</h3>
+          <p class="section-desc">Cambia los datos de la cuenta. Deja la contraseña vacía para mantener la actual.</p>
+        } @else {
+          <h3>Registrar Nuevo Administrador de Colegio</h3>
+          <p class="section-desc">Esta cuenta se asociará automáticamente a <strong>{{ colegio.nombre }}</strong> con rol exclusivo de Administrador de Colegio.</p>
+        }
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input
+              type="text"
+              placeholder="ej: Juan Carlos"
+              [ngModel]="adminForm().nombre"
+              (ngModelChange)="adminForm.update(f => ({ ...f, nombre: $event }))"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Apellido *</label>
+            <input
+              type="text"
+              placeholder="ej: Pérez Soto"
+              [ngModel]="adminForm().apellido"
+              (ngModelChange)="adminForm.update(f => ({ ...f, apellido: $event }))"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>Correo Electrónico *</label>
+            <input
+              type="email"
+              placeholder="admin@colegio.cl"
+              [ngModel]="adminForm().email"
+              (ngModelChange)="adminForm.update(f => ({ ...f, email: $event }))"
+            />
+          </div>
+
+          <div class="form-group">
+            <label>{{ editandoId() ? 'Nueva contraseña (opcional)' : 'Contraseña Inicial *' }}</label>
+            <input
+              type="password"
+              placeholder="Mínimo 6 caracteres"
+              [ngModel]="adminForm().password"
+              (ngModelChange)="adminForm.update(f => ({ ...f, password: $event }))"
+            />
+          </div>
+        </div>
+
+        <div class="form-actions">
+          @if (editandoId()) {
+            <button type="button" class="btn btn-secondary rs-btn rs-btn--secondary" [disabled]="guardando()" (click)="cancelarEdicion()">
+              Cancelar
+            </button>
+          }
+          <button type="button" class="btn btn-primary rs-btn rs-btn--primary" [disabled]="guardando()" (click)="guardarAdmin()">
+            @if (editandoId()) {
+              {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
+            } @else {
+              {{ guardando() ? 'Creando...' : '🔑 Crear Administrador' }}
+            }
+          </button>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- Listado de Administradores del Colegio -->
+      <div class="admins-list-section">
+        <h3>Administradores Registrados ({{ admins().length }})</h3>
+
+        @if (cargando()) {
+          <p class="loading-text">Cargando administradores...</p>
+        } @else if (admins().length === 0) {
+          <p class="empty-text">No hay cuentas de administrador registradas para este colegio todavía.</p>
+        } @else {
+          <div class="admins-grid">
+            @for (adm of admins(); track adm.id) {
+              <div class="admin-card">
+                <div class="admin-avatar">👤</div>
+                <div class="admin-info">
+                  <span class="admin-name">{{ adm.first_name }} {{ adm.last_name }}</span>
+                  <span class="admin-email">{{ adm.email }}</span>
+                  <span class="admin-role-badge">🏫 Admin Colegio</span>
+                </div>
+                @if (puedeEditar) {
+                  <button type="button" class="admin-edit-btn" (click)="editarAdmin(adm)" title="Editar administrador">✏️ Editar</button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

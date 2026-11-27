@@ -1,0 +1,474 @@
+<ion-content [fullscreen]="true">
+
+  <div class="page-container">
+
+    <!-- =========================
+         ENCABEZADO
+    ========================== -->
+
+    <div class="header-section rs-page-header">
+
+      <div class="header-info">
+
+        <span class="section-label">
+          MIS HIJOS
+        </span>
+
+        <h1>Agregar hijo</h1>
+
+      </div>
+
+      <ion-menu-toggle menu="main-menu">
+
+        <button
+          class="menu-button rs-header-action"
+          type="button"
+          title="Abrir menú">
+
+          <ion-icon name="menu-outline"></ion-icon>
+
+        </button>
+
+      </ion-menu-toggle>
+
+    </div>
+
+
+    <!-- =========================
+         DESCRIPCIÓN
+    ========================== -->
+
+    <div class="intro-card">
+
+      <div class="intro-icon">
+        🎓
+      </div>
+
+      <div>
+
+        <h2>Nuevo estudiante</h2>
+
+        <p>
+          Ingresa los datos del estudiante para asociarlo
+          a tu cuenta de Rutas Seguras.
+        </p>
+
+      </div>
+
+    </div>
+
+
+    <!-- =========================
+         DATOS DEL ESTUDIANTE
+    ========================== -->
+
+    <section class="form-section">
+
+      <div class="section-title">
+
+        <span class="section-number">
+          01
+        </span>
+
+        <div>
+          <span class="section-label">
+            INFORMACIÓN
+          </span>
+
+          <h2>Datos del estudiante</h2>
+        </div>
+
+      </div>
+
+      <!-- Consentimiento biométrico de ESTE hijo (Ley 21.719): opcional y parte apagado. -->
+      <div class="biometria-toggle">
+        <ion-toggle
+          justify="space-between"
+          [checked]="usaBiometria"
+          (ionChange)="cambiarUsoBiometria($event.detail.checked)">
+          <strong>Usar reconocimiento facial{{ nombre.trim() ? ' para ' + nombre.trim() : ' para este hijo' }}</strong>
+        </ion-toggle>
+        <app-consentimiento-biometrico [nombre]="nombre.trim()"></app-consentimiento-biometrico>
+      </div>
+
+      @if (usaBiometria) {
+        <div class="photo-upload">
+          @if (vistaPreviaFoto) {
+            <img [src]="vistaPreviaFoto" alt="Vista previa de la foto seleccionada">
+            <ion-button fill="clear" color="danger" type="button" aria-label="Quitar foto" (click)="quitarFoto()">
+              <ion-icon name="close-outline"></ion-icon>
+            </ion-button>
+          } @else {
+            <ion-icon name="camera-outline"></ion-icon>
+          }
+
+          <div class="photo-content">
+            <div class="photo-heading">
+              <strong>Foto del estudiante</strong>
+              <span>Necesaria para el reconocimiento facial</span>
+            </div>
+            <p class="photo-description">Agrega una foto frontal, clara y con un solo rostro.</p>
+            @if (!camaraAbierta) {
+              <div class="photo-actions">
+                <ion-button class="photo-button" type="button" (click)="abrirCamara()">
+                  <ion-icon name="camera-outline" slot="start"></ion-icon>
+                  Tomar foto
+                </ion-button>
+                <ion-button class="photo-button photo-button-secondary" type="button" (click)="archivoFoto.click()">
+                  <ion-icon name="images-outline" slot="start"></ion-icon>
+                  Elegir de galería
+                </ion-button>
+              </div>
+              <input
+                #archivoFoto
+                class="photo-input"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                (change)="seleccionarFoto($event)">
+            }
+            <small class="photo-formats">JPG, PNG o WebP · Máximo 5 MB</small>
+          </div>
+        </div>
+
+        @if (camaraAbierta) {
+          <div class="camera-capture-panel">
+            @if (camarasDisponibles.length > 1) {
+              <label for="camara-estudiante">Cámara</label>
+              <select id="camara-estudiante" [value]="camaraSeleccionada" (change)="cambiarCamara($event)">
+                @for (camara of camarasDisponibles; track camara.deviceId) {
+                  <option [value]="camara.deviceId">{{ camara.label || 'Cámara disponible' }}</option>
+                }
+              </select>
+            }
+            <video #cameraPreview autoplay playsinline muted aria-label="Vista previa de la cámara"></video>
+            <div class="camera-actions">
+              <ion-button type="button" (click)="capturarFoto()">Capturar foto</ion-button>
+              <ion-button fill="outline" type="button" (click)="alternarCamara()">
+                <ion-icon slot="start" name="camera-reverse-outline"></ion-icon>
+                Cambiar cámara
+              </ion-button>
+              <ion-button fill="clear" type="button" (click)="cancelarCaptura()">Cancelar</ion-button>
+            </div>
+          </div>
+        }
+      } @else {
+        <div class="sin-biometria" role="note">
+          <ion-icon name="qr-code-outline"></ion-icon>
+          <div>
+            <strong>Sin reconocimiento facial</strong>
+            <p>No se pide foto. Subirá y bajará del furgón con tu código QR o con el inspector. Puedes
+              autorizarlo cuando quieras desde el detalle del hijo.</p>
+          </div>
+        </div>
+      }
+
+
+      <ion-item
+        lines="none"
+        class="input-item">
+
+        <ion-input
+          label="Nombre"
+          labelPlacement="floating"
+          type="text"
+          placeholder="Nombre del estudiante"
+          [(ngModel)]="nombre">
+        </ion-input>
+
+      </ion-item>
+
+
+      <ion-item
+        lines="none"
+        class="input-item">
+
+        <ion-input
+          label="Apellido"
+          labelPlacement="floating"
+          type="text"
+          placeholder="Apellido del estudiante"
+          [(ngModel)]="apellido">
+        </ion-input>
+
+      </ion-item>
+
+
+      <ion-item
+        lines="none"
+        class="input-item">
+
+        <ion-input
+          label="RUT"
+          labelPlacement="floating"
+          type="text"
+          placeholder="12.345.678-9"
+          [(ngModel)]="rut"
+          (ionBlur)="verificarRut()">
+        </ion-input>
+
+      </ion-item>
+
+      <!-- El colegio sale del RUT del hijo: es el que lo habilitó para tu cuenta. -->
+      @if (verificandoRut) {
+        <p class="section-description">Verificando el RUT del estudiante...</p>
+      } @else if (errorRut) {
+        <p class="section-description error-text">{{ errorRut }}</p>
+      } @else if (colegioNombre) {
+        <p class="section-description">Colegio: <strong>{{ colegioNombre }}</strong></p>
+      } @else {
+        <p class="section-description">Escribe el RUT de tu hijo: el colegio se asigna según el que lo habilitó.</p>
+      }
+
+
+      <ion-item
+        lines="none"
+        class="input-item">
+
+        <ion-input
+          label="Fecha de nacimiento"
+          labelPlacement="floating"
+          type="date"
+          [(ngModel)]="fechaNacimiento">
+        </ion-input>
+
+      </ion-item>
+
+
+
+
+      @if (colegioId && cargandoSedes) {
+        <p class="section-description">Cargando sedes del colegio...</p>
+      }
+
+      @if (colegioId && !cargandoSedes && sedesList.length > 1) {
+        <ion-item lines="none" class="input-item">
+          <ion-select
+            label="Sede *"
+            labelPlacement="floating"
+            placeholder="Selecciona una sede"
+            [(ngModel)]="sedeId">
+            @for (sd of sedesList; track sd.id) {
+              <ion-select-option [value]="sd.id">{{ sd.nombre }}</ion-select-option>
+            }
+          </ion-select>
+        </ion-item>
+      }
+
+      @if (colegioId && !cargandoSedes && sedesList.length === 1 && !sedesList[0].oculta) {
+        <p class="section-description">
+          Sede asignada automáticamente:
+          <strong>{{ sedesList[0].nombre }}</strong>
+        </p>
+      }
+
+      @if (colegioId && !cargandoSedes && sedesList.length === 0) {
+        <p class="section-description">
+          Este colegio no tiene sedes activas registradas, así que todavía no puedes agregar a tu hijo.
+          Contacta al colegio para que registre su sede.
+        </p>
+      }
+
+
+      <ion-item
+        lines="none"
+        class="input-item">
+
+        <ion-select
+          label="Curso"
+          labelPlacement="floating"
+          placeholder="Selecciona el curso"
+          interface="alert"
+          [(ngModel)]="curso">
+          @for (cursoDisponible of cursosDisponibles; track cursoDisponible) {
+            <ion-select-option [value]="cursoDisponible">
+              {{ cursoDisponible }}
+            </ion-select-option>
+          }
+        </ion-select>
+
+      </ion-item>
+
+    </section>
+
+
+    <!-- =========================
+         DESTINO PRINCIPAL
+    ========================== -->
+
+    <section class="form-section">
+
+      <div class="section-title">
+
+        <span class="section-number">
+          02
+        </span>
+
+        <div>
+
+          <span class="section-label">
+            TRANSPORTE
+          </span>
+
+          <h2>Destino principal</h2>
+
+        </div>
+
+      </div>
+
+
+      <p class="section-description">
+        Busca la dirección, selecciona una coincidencia y ajusta el marcador si necesitas
+        dejar la entrada exacta. Esta ubicación será la que reciba el conductor.
+      </p>
+
+      <app-selector-ubicacion
+        etiqueta="Dirección"
+        [direccion]="direccionPrincipal"
+        [comuna]="comunaPrincipal"
+        [region]="regionPrincipal"
+        [latitud]="latitud"
+        [longitud]="longitud"
+        [latitudReferencia]="sedeSeleccionada?.latitud"
+        [longitudReferencia]="sedeSeleccionada?.longitud"
+        (ubicacionCambio)="ubicacionCambio($event)">
+      </app-selector-ubicacion>
+
+    </section>
+
+
+
+
+    <!-- =========================
+         PERSONA AUTORIZADA
+    ========================== -->
+
+    <section class="form-section">
+
+      <div class="section-title">
+
+        <span class="section-number optional-number">
+          03
+        </span>
+
+        <div>
+
+          <span class="section-label">
+            SEGURIDAD
+          </span>
+
+          <h2>Persona autorizada</h2>
+
+        </div>
+
+      </div>
+
+
+      <p class="section-description">
+
+        Persona que podrá recibir al estudiante
+        en su destino.
+
+      </p>
+
+
+      <ion-item
+        lines="none"
+        class="input-item">
+
+        <ion-input
+          label="Nombre"
+          labelPlacement="floating"
+          type="text"
+          placeholder="Nombre de la persona"
+          [(ngModel)]="personaAutorizada">
+        </ion-input>
+
+      </ion-item>
+
+
+      <ion-item
+        lines="none"
+        class="input-item">
+
+        <ion-input
+          label="Apellido"
+          labelPlacement="floating"
+          type="text"
+          placeholder="Apellido de la persona"
+          [(ngModel)]="apellidoPersonaAutorizada">
+        </ion-input>
+
+      </ion-item>
+
+
+      <ion-item
+        lines="none"
+        class="input-item">
+
+        <ion-input
+          label="RUT"
+          labelPlacement="floating"
+          type="text"
+          placeholder="12.345.678-9"
+          [(ngModel)]="rutPersonaAutorizada">
+        </ion-input>
+
+      </ion-item>
+
+    </section>
+
+
+    <!-- =========================
+         ERROR
+    ========================== -->
+
+    @if (errorMensaje) {
+
+      <div class="error-message">
+
+        <ion-icon name="alert-circle-outline"></ion-icon>
+
+        <span>
+          {{ errorMensaje }}
+        </span>
+
+      </div>
+
+    }
+
+
+    <!-- =========================
+         GUARDAR
+    ========================== -->
+
+    <ion-button
+      expand="block"
+      class="save-button"
+      [disabled]="cargando"
+      (click)="guardarEstudiante()">
+
+      <!-- Mantener nodos estables evita duplicaciones visuales del texto. -->
+      <ion-spinner
+        name="crescent"
+        [style.display]="cargando ? 'inline-block' : 'none'">
+      </ion-spinner>
+      <span [style.display]="cargando ? 'none' : 'inline'">
+        Registrar estudiante
+      </span>
+
+    </ion-button>
+
+
+    <div class="footer-message">
+
+      <span>🚌</span>
+
+      <p>
+        Tu ruta escolar, más segura.
+      </p>
+
+    </div>
+
+  </div>
+
+</ion-content>

@@ -1,0 +1,358 @@
+<ion-content [fullscreen]="true" class="seguimiento-content">
+
+  <div class="seguimiento-page">
+
+    <!-- =========================================
+         ENCABEZADO
+    ========================================== -->
+
+    <div class="page-header rs-detail-header">
+
+      <button class="back-button rs-header-action" type="button" (click)="volver()" aria-label="Volver">
+        <ion-icon name="arrow-back-outline"></ion-icon>
+      </button>
+
+      <h1>Seguimiento</h1>
+
+    </div>
+
+    @if (estudiantes.length > 1) {
+    <div class="student-selector">
+      <label for="seguimiento-estudiante">Hijo a seguir</label>
+      <select
+        id="seguimiento-estudiante"
+        [value]="estudianteSeleccionadoId"
+        (change)="seleccionarHijo($event)"
+      >
+        @for (estudiante of estudiantes; track estudiante.id) {
+        <option [value]="estudiante.id">
+          {{ estudiante.nombre }} {{ estudiante.apellido }}
+        </option>
+        }
+      </select>
+    </div>
+    }
+
+
+    <!-- =========================================
+         CARGANDO
+    ========================================== -->
+
+    @if (cargando) {
+
+    <div class="loading-container">
+
+      <ion-spinner></ion-spinner>
+
+      <p>
+        Cargando seguimiento...
+      </p>
+
+    </div>
+
+    }
+
+
+    <!-- =========================================
+         ERROR
+    ========================================== -->
+
+    @else if (error) {
+
+    <div class="error-container">
+
+      <div class="error-icon">
+
+        <ion-icon name="alert-circle-outline"></ion-icon>
+
+      </div>
+
+      <h2>
+        No se pudo cargar el seguimiento
+      </h2>
+
+      <p>
+        {{ error }}
+      </p>
+
+      <button class="retry-button" type="button" (click)="cargarSeguimiento()">
+        <ion-icon name="refresh-outline"></ion-icon>
+
+        Reintentar
+      </button>
+
+    </div>
+
+    }
+
+
+    <!-- =========================================
+         DATOS DEL SEGUIMIENTO
+    ========================================== -->
+
+    @else if (seguimiento) {
+
+
+    <!-- =====================================
+           ESTADO DE LA RUTA
+      ====================================== -->
+
+    @if (seguimiento.estudiante.no_asiste_hoy) {
+      <div class="absence-banner">
+        Avisaste que hoy {{ seguimiento.estudiante.nombre }} no usa el furgón en este recorrido:
+        el conductor no pasará por él. Puedes revertirlo en "Mis hijos" → detalle.
+      </div>
+    }
+
+    <div class="status-card">
+
+      <div class="status-indicator">
+
+        <span class="status-dot" [class.active]="
+              seguimiento.ruta.estado === 'en_camino'
+            "></span>
+
+      </div>
+
+      <div class="status-info">
+
+        <strong>
+          {{ estadoRuta }}
+        </strong>
+
+        <span>
+          {{ descripcionEstado }}
+        </span>
+
+      </div>
+
+    </div>
+
+
+    @if (sinRutaEnCurso) {
+    <div class="where-card" [class.sin-dato]="!seguimiento.estudiante.donde_esta?.lugar">
+      <span class="where-icon" aria-hidden="true">{{ iconoDondeEsta }}</span>
+      <div>
+        <strong>{{ tituloDondeEsta }}</strong>
+        @if (seguimiento.estudiante.donde_esta?.detalle) {
+        <span>{{ seguimiento.estudiante.donde_esta?.detalle }}</span>
+        }
+      </div>
+    </div>
+    }
+
+    <!-- =====================================
+           MAPA
+      ====================================== -->
+
+    <div class="map-container">
+
+      @if (tieneUbicacion || tieneRecorrido) {
+
+      <div id="mapa-seguimiento" class="mapa-leaflet"></div>
+
+      @if (!tieneUbicacion) {
+      <div class="gps-pending">
+        Esperando la primera ubicación GPS del conductor…
+      </div>
+      }
+
+      }
+
+      @else {
+
+      <div class="no-location">
+
+        <ion-icon name="location-outline"></ion-icon>
+
+        <strong>
+          Ubicación no disponible
+        </strong>
+
+        <span>
+          El furgón aún no ha enviado su ubicación.
+        </span>
+
+      </div>
+
+      }
+
+    </div>
+
+
+    <!-- =====================================
+           CONDUCTOR
+      ====================================== -->
+
+    <div class="trip-card">
+
+      <div class="trip-section">
+
+        <div class="trip-icon">
+
+          <ion-icon name="person-outline"></ion-icon>
+
+        </div>
+
+        <div class="trip-info">
+
+          <span class="label">
+            Conductor
+          </span>
+
+          <strong>
+            {{ seguimiento.conductor.nombre }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================
+             ESTUDIANTE
+        ==================================== -->
+
+      <div class="trip-section">
+
+        <div class="trip-icon">
+
+          <ion-icon name="school-outline"></ion-icon>
+
+        </div>
+
+        <div class="trip-info">
+
+          <span class="label">
+            Estudiante
+          </span>
+
+          <strong>
+            {{ seguimiento.estudiante.nombre }}
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- ===================================
+             RUTA
+        ==================================== -->
+
+      <div class="trip-section">
+
+        <div class="trip-icon">
+
+          <ion-icon name="map-outline"></ion-icon>
+
+        </div>
+
+        <div class="trip-info">
+
+          <span class="label">
+            Ruta
+          </span>
+
+          <strong>
+            {{ seguimiento.ruta.nombre }}
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================
+           INFORMACIÓN DEL VIAJE
+      ====================================== -->
+
+    <div class="info-grid">
+
+
+      <!-- LLEGADA -->
+
+      <div class="info-box">
+
+        <ion-icon name="time-outline"></ion-icon>
+
+        <div>
+
+          <span>
+            Llegada estimada
+          </span>
+
+          <strong>
+
+            @if (seguimiento.llegada_estimada) {
+
+            {{ seguimiento.llegada_estimada }}
+
+            } @else {
+
+            Calculando...
+
+            }
+
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- ÚLTIMA UBICACIÓN -->
+
+      <div class="info-box">
+
+        <ion-icon name="location-outline"></ion-icon>
+
+        <div>
+
+          <span>
+            Última ubicación
+          </span>
+
+          <strong>
+
+            @if (
+            seguimiento.ubicacion.ultima_actualizacion
+            ) {
+
+            {{ seguimiento.ubicacion.ultima_actualizacion | date:'HH:mm:ss' }}
+
+            } @else {
+
+            Sin datos
+
+            }
+
+          </strong>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- =====================================
+           RUTA COMPLETA
+      ====================================== -->
+
+    <button class="secondary-action" type="button" (click)="verRutaCompleta()">
+
+      <ion-icon name="map-outline"></ion-icon>
+
+      Ver ruta completa
+
+    </button>
+
+
+    }
+
+  </div>
+
+</ion-content>

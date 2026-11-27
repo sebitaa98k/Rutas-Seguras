@@ -1,0 +1,226 @@
+<div class="list-page fade-in">
+  <div class="list-header">
+    <div>
+      <h2>Habilitación para la app</h2>
+      <p>Solo los apoderados habilitados pueden crear su cuenta, y solo pueden inscribir a los hijos que habilites aquí.</p>
+    </div>
+    <a routerLink="/apoderados" class="rs-btn rs-btn--secondary">Volver a apoderados</a>
+  </div>
+
+  <div class="pestanas" role="tablist">
+    <button type="button" role="tab" class="pestana" [class.activa]="pestana === 'estudiantes'"
+      [attr.aria-selected]="pestana === 'estudiantes'" (click)="cambiarPestana('estudiantes')">
+      Estudiantes habilitados
+    </button>
+    <button type="button" role="tab" class="pestana" [class.activa]="pestana === 'apoderados'"
+      [attr.aria-selected]="pestana === 'apoderados'" (click)="cambiarPestana('apoderados')">
+      Apoderados habilitados
+    </button>
+  </div>
+
+  @if (pestana === 'estudiantes') {
+    <!-- ============================================================ ESTUDIANTES -->
+    <form class="carga glass-panel rs-card" (ngSubmit)="habilitar()">
+      <label for="pares-carga">Habilitar estudiantes</label>
+      <p class="ayuda">
+        Escribe una línea por estudiante con el <strong>RUT del apoderado</strong> y el <strong>RUT del estudiante</strong>,
+        separados por coma. El apoderado queda habilitado automáticamente. Cuando agregue a su hijo en la app,
+        quedará inscrito en este colegio.
+      </p>
+      @if (sinColegioElegido) {
+        <p class="aviso" role="status">Elige un colegio en el selector de arriba a la derecha para habilitar estudiantes.</p>
+      }
+      <textarea
+        id="pares-carga"
+        name="textoPares"
+        rows="4"
+        placeholder="RUT apoderado, RUT estudiante&#10;Ejemplo: 12345678-5, 23456789-6"
+        [disabled]="sinColegioElegido"
+        [(ngModel)]="textoPares"
+      ></textarea>
+      <div class="carga-acciones">
+        <button type="submit" class="btn-primary rs-btn rs-btn--primary"
+          [disabled]="guardandoPares || !textoPares.trim() || sinColegioElegido">
+          {{ guardandoPares ? 'Habilitando...' : 'Habilitar' }}
+        </button>
+        @if (resultadoPares) {
+          <span class="resultado" role="status">{{ resultadoPares }}</span>
+        }
+      </div>
+    </form>
+
+    <form class="filtros glass-panel rs-card" (ngSubmit)="cargarEstudiantes()">
+      <label class="buscar">
+        Buscar
+        <input type="search" name="buscarEstudiante" placeholder="RUT del estudiante o del apoderado" [(ngModel)]="buscarEstudiante" />
+      </label>
+      <label>
+        Estado
+        <select name="estadoEstudiante" [(ngModel)]="estadoEstudiante" (change)="cargarEstudiantes()">
+          <option value="">Todos</option>
+          <option value="disponible">Sin inscribir</option>
+          <option value="usado">Inscritos</option>
+        </select>
+      </label>
+      <button type="submit" class="btn-primary rs-btn rs-btn--primary">Filtrar</button>
+    </form>
+
+    <div class="table-card glass-panel rs-card">
+      @if (cargandoEstudiantes) {
+        <p class="estado-lista">Cargando...</p>
+      } @else if (errorEstudiantes) {
+        <p class="estado-lista error" role="alert">{{ errorEstudiantes }}</p>
+      } @else if (estudiantes.length === 0) {
+        <p class="estado-lista">No hay estudiantes habilitados con estos filtros.</p>
+      } @else {
+        <div class="table-responsive rs-table-scroll">
+          <table class="custom-table rs-table rs-table--compact">
+            <thead>
+              <tr>
+                <th>RUT estudiante</th>
+                <th>RUT apoderado</th>
+                @if (variosColegiosEstudiantes) {
+                  <th>Colegio</th>
+                }
+                <th>Estado</th>
+                <th>Apoderado</th>
+                <th>Habilitado</th>
+                <th class="acciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entrada of estudiantes; track entrada.id) {
+                <tr>
+                  <td class="font-bold">{{ entrada.rut }}</td>
+                  <td>{{ entrada.rut_apoderado }}</td>
+                  @if (variosColegiosEstudiantes) {
+                    <td>{{ entrada.colegio_nombre }}</td>
+                  }
+                  <td>
+                    <span class="etiqueta" [class.usado]="entrada.estado === 'usado'">
+                      {{ entrada.estado === 'usado' ? 'Inscrito' : 'Sin inscribir' }}
+                    </span>
+                    @if (entrada.estudiante) {
+                      <br /><small>{{ entrada.estudiante.nombre }}</small>
+                    }
+                  </td>
+                  <td>
+                    @if (entrada.apoderado) {
+                      {{ entrada.apoderado.nombre }}<br />
+                      <small>{{ entrada.apoderado.email }}</small>
+                    } @else {
+                      <small>Aún no crea su cuenta</small>
+                    }
+                  </td>
+                  <td>{{ entrada.creado_en | date:'dd/MM/yyyy' }}</td>
+                  <td class="acciones">
+                    @if (entrada.estado === 'disponible') {
+                      <button type="button" class="rs-btn rs-btn--secondary" (click)="quitarEstudiante(entrada)">Quitar</button>
+                    } @else {
+                      —
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (estudiantes.length >= limiteEstudiantes) {
+          <p class="estado-lista">Se muestran los {{ limiteEstudiantes }} más recientes. Usa la búsqueda para encontrar otros.</p>
+        }
+      }
+    </div>
+  } @else {
+    <!-- ============================================================ APODERADOS -->
+    <p class="ayuda glass-panel rs-card">
+      Los apoderados se habilitan solos al habilitar a uno de sus hijos en la pestaña <strong>Estudiantes habilitados</strong>.
+      Aquí puedes ver si ya crearon su cuenta, quitar un RUT o liberarlo si lo usó la persona equivocada.
+    </p>
+
+    <form class="filtros glass-panel rs-card" (ngSubmit)="cargar()">
+      <label class="buscar">
+        Buscar
+        <input type="search" name="buscar" placeholder="RUT, nombre o correo" [(ngModel)]="buscar" />
+      </label>
+      <label>
+        Estado
+        <select name="estado" [(ngModel)]="estado" (change)="cargar()">
+          <option value="">Todos</option>
+          <option value="disponible">Sin cuenta</option>
+          <option value="usado">Con cuenta</option>
+        </select>
+      </label>
+      <button type="submit" class="btn-primary rs-btn rs-btn--primary">Filtrar</button>
+    </form>
+
+    <div class="table-card glass-panel rs-card">
+      @if (cargando) {
+        <p class="estado-lista">Cargando...</p>
+      } @else if (error) {
+        <p class="estado-lista error" role="alert">{{ error }}</p>
+      } @else if (ruts.length === 0) {
+        <p class="estado-lista">No hay apoderados habilitados con estos filtros.</p>
+      } @else {
+        <div class="table-responsive rs-table-scroll">
+          <table class="custom-table rs-table rs-table--compact">
+            <thead>
+              <tr>
+                <th>RUT</th>
+                @if (variosColegios) {
+                  <th>Colegio</th>
+                }
+                <th>Estado</th>
+                <th>Cuenta</th>
+                <th>Registrado</th>
+                <th>Última liberación</th>
+                <th class="acciones">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (entrada of ruts; track entrada.id) {
+                <tr>
+                  <td class="font-bold">{{ entrada.rut }}</td>
+                  @if (variosColegios) {
+                    <td>{{ entrada.colegio_nombre }}</td>
+                  }
+                  <td>
+                    <span class="etiqueta" [class.usado]="entrada.estado === 'usado'">
+                      {{ entrada.estado === 'usado' ? 'Con cuenta' : 'Sin cuenta' }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (entrada.cuenta) {
+                      {{ entrada.cuenta.nombre }}<br />
+                      <small>{{ entrada.cuenta.email }} · {{ entrada.cuenta.estudiantes }} estudiante(s)</small>
+                    } @else {
+                      —
+                    }
+                  </td>
+                  <td>{{ entrada.usado_en ? (entrada.usado_en | date:'dd/MM/yyyy HH:mm') : '—' }}</td>
+                  <td>
+                    @if (entrada.liberado_en) {
+                      {{ entrada.liberado_en | date:'dd/MM/yyyy HH:mm' }}<br />
+                      <small>{{ entrada.cuenta_liberada }}</small>
+                    } @else {
+                      —
+                    }
+                  </td>
+                  <td class="acciones">
+                    @if (entrada.estado === 'usado') {
+                      <button type="button" class="rs-btn rs-btn--secondary" (click)="liberar(entrada)">Liberar RUT</button>
+                    } @else {
+                      <button type="button" class="rs-btn rs-btn--secondary" (click)="eliminar(entrada)">Quitar</button>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (ruts.length >= limite) {
+          <p class="estado-lista">Se muestran los {{ limite }} más recientes. Usa la búsqueda para encontrar otros.</p>
+        }
+      }
+    </div>
+  }
+</div>

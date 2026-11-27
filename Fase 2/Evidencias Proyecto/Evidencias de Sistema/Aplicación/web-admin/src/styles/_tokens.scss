@@ -1,0 +1,135 @@
+:root {
+  /* Identidad compartida Rutas Seguras */
+  --rs-color-primary: #0f766e;
+  --rs-color-primary-hover: #0b5f59;
+  --rs-color-primary-soft: #e8f5f3;
+  --rs-color-primary-subtle: #f2f8f7;
+
+  /* Superficies */
+  --rs-color-background: #f7faf9;
+  --rs-color-surface: #ffffff;
+  --rs-color-surface-warm: #fffdf8;
+  --rs-color-surface-soft: #f8fafc;
+
+  /* Texto y bordes */
+  --rs-color-text: #173330;
+  --rs-color-text-muted: #6b7c79;
+  --rs-color-text-soft: #8a9996;
+  --rs-color-border: #dce7e5;
+  --rs-color-border-soft: #edf2f1;
+
+  /* Acento y estados */
+  --rs-color-accent: #f4b52b;
+  --rs-color-accent-soft: #fff4d6;
+  --rs-color-success: #16805f;
+  --rs-color-success-soft: #e7f6ef;
+  --rs-color-warning: #b66a08;
+  --rs-color-warning-soft: #fef3c7;
+  --rs-color-danger: #b42318;
+  --rs-color-danger-soft: #feeceb;
+  --rs-color-info: #2563a8;
+  --rs-color-info-soft: #e8f1fb;
+
+  /* Sidebar: se conserva su identidad actual durante la migración */
+  --rs-color-sidebar: #285f59;
+  --rs-color-sidebar-hover: #234f4a;
+
+  /* Tipografía */
+  --rs-font-family:
+    'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
+  --rs-font-size-xs: 0.75rem;
+  --rs-font-size-sm: 0.8125rem;
+  --rs-font-size-md: 0.875rem;
+  --rs-font-size-base: 1rem;
+  --rs-font-size-lg: 1.125rem;
+  --rs-font-size-xl: 1.5rem;
+  --rs-font-size-2xl: 1.875rem;
+  --rs-font-weight-regular: 400;
+  --rs-font-weight-medium: 500;
+  --rs-font-weight-semibold: 600;
+  --rs-font-weight-bold: 700;
+  --rs-font-weight-extrabold: 800;
+  --rs-line-height-tight: 1.2;
+  --rs-line-height-base: 1.5;
+  --rs-line-height-relaxed: 1.7;
+
+  /* Espaciado */
+  --rs-space-1: 4px;
+  --rs-space-2: 8px;
+  --rs-space-3: 12px;
+  --rs-space-4: 16px;
+  --rs-space-5: 20px;
+  --rs-space-6: 24px;
+  --rs-space-8: 32px;
+  --rs-space-10: 40px;
+
+  /* Geometría */
+  --rs-radius-sm: 8px;
+  --rs-radius-md: 12px;
+  --rs-radius-lg: 16px;
+  --rs-radius-xl: 20px;
+  --rs-radius-pill: 9999px;
+
+  /* Profundidad */
+  --rs-shadow-card: 0 4px 16px rgba(23, 51, 48, 0.06);
+  --rs-shadow-raised: 0 8px 24px rgba(23, 51, 48, 0.1);
+  --rs-shadow-navigation: 0 -8px 24px rgba(23, 51, 48, 0.08);
+
+  /* Controles base para adopción gradual */
+  --rs-control-height: 48px;
+  --rs-control-padding-inline: 16px;
+  --rs-button-height: 44px;
+  --rs-button-radius: var(--rs-radius-md);
+  --rs-card-radius: var(--rs-radius-lg);
+  --rs-card-padding: var(--rs-space-4);
+  --rs-input-radius: var(--rs-radius-md);
+  --rs-input-border: var(--rs-color-border);
+  --rs-focus-ring: 0 0 0 3px rgba(15, 118, 110, 0.18);
+  --rs-transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Alias de compatibilidad con la API de tokens anterior */
+  --rs-primary: var(--rs-color-primary);
+  --rs-primary-hover: var(--rs-color-primary-hover);
+  --rs-primary-soft: var(--rs-color-primary-soft);
+  --rs-bg: var(--rs-color-background);
+  --rs-surface: var(--rs-color-surface);
+  --rs-surface-soft: var(--rs-color-surface-soft);
+  --rs-text: var(--rs-color-text);
+  --rs-text-brand: var(--rs-color-text);
+  --rs-muted: var(--rs-color-text-muted);
+  --rs-border: var(--rs-color-border);
+  --rs-success: var(--rs-color-success);
+  --rs-success-soft: var(--rs-color-success-soft);
+  --rs-danger: var(--rs-color-danger);
+  --rs-danger-soft: var(--rs-color-danger-soft);
+  --rs-info: var(--rs-color-info);
+  --rs-info-soft: var(--rs-color-info-soft);
+
+  /* Alias temporales para adopción incremental */
+  --rs-primary-dark: var(--rs-primary-hover);
+  --rs-primary-light: var(--rs-primary-soft);
+  --rs-background: var(--rs-bg);
+  --rs-text-dark: var(--rs-text-brand);
+  --rs-error: var(--rs-danger);
+  --rs-error-bg: var(--rs-danger-soft);
+
+  /* Compatibilidad con utilidades globales existentes */
+  --primary-400: var(--rs-primary);
+  --accent-amber: var(--rs-color-accent);
+  --accent-emerald: var(--rs-success);
+  --accent-rose: var(--rs-danger);
+  --accent-purple: #8b5cf6;
+  --bg-app: var(--rs-bg);
+  --bg-card: var(--rs-surface);
+  --border-subtle: var(--rs-border);
+  --text-primary: var(--rs-text);
+  --text-secondary: var(--rs-muted);
+  --text-muted: var(--rs-muted);
+  --shadow-md: var(--rs-shadow-card);
+  --radius-sm: var(--rs-radius-sm);
+  --radius-md: var(--rs-radius-md);
+  --radius-lg: var(--rs-radius-lg);
+  --radius-full: var(--rs-radius-pill);
+  --transition-fast: var(--rs-transition-fast);
+}

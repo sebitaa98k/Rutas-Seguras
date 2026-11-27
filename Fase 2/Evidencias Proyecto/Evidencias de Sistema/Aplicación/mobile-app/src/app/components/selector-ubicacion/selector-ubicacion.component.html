@@ -1,0 +1,110 @@
+<div class="territorio-row">
+  <ion-item lines="none" class="input-item">
+    <ion-select
+      label="Región"
+      labelPlacement="floating"
+      interface="action-sheet"
+      placeholder="Selecciona región"
+      [(ngModel)]="regionSeleccionada"
+      (ionChange)="regionElegida()">
+      @for (region of regiones; track region) {
+        <ion-select-option [value]="region">{{ region }}</ion-select-option>
+      }
+    </ion-select>
+  </ion-item>
+
+  <ion-item lines="none" class="input-item">
+    @if (comunasDisponibles.length) {
+      <ion-select
+        label="Comuna"
+        labelPlacement="floating"
+        interface="action-sheet"
+        placeholder="Selecciona comuna"
+        [(ngModel)]="comunaSeleccionada"
+        (ionChange)="comunaElegida()">
+        @for (comuna of comunasDisponibles; track comuna) {
+          <ion-select-option [value]="comuna">{{ comuna }}</ion-select-option>
+        }
+      </ion-select>
+    } @else {
+      <ion-input
+        label="Comuna"
+        labelPlacement="floating"
+        placeholder="Escribe la comuna"
+        [disabled]="!regionSeleccionada"
+        [(ngModel)]="comunaSeleccionada"
+        (ionInput)="comunaElegida()">
+      </ion-input>
+    }
+  </ion-item>
+</div>
+
+<div class="address-search-row">
+  <ion-item lines="none" class="input-item">
+    <ion-input
+      [label]="etiqueta + ' (calle y número)'"
+      labelPlacement="floating"
+      [placeholder]="placeholder"
+      [(ngModel)]="textoDireccion"
+      (ionInput)="direccionEscrita()">
+    </ion-input>
+  </ion-item>
+
+  <ion-button
+    type="button"
+    class="address-search-button"
+    [disabled]="buscando"
+    (click)="buscar()">
+    <!-- Mantener nodos estables evita que Ionic duplique el texto al cambiar el estado. -->
+    <ion-spinner
+      name="crescent"
+      [style.display]="buscando ? 'inline-block' : 'none'">
+    </ion-spinner>
+    <span [style.display]="buscando ? 'none' : 'inline'">
+      Buscar
+    </span>
+  </ion-button>
+</div>
+
+<button type="button" class="manual-map-button" (click)="abrirMapaManual()">
+  Elegir en el mapa
+</button>
+
+@if (faltaNumeracion) {
+  <p class="location-warning">
+    Incluye la numeración (y depto o casa si corresponde): el conductor la necesita para saber cuál es la casa.
+  </p>
+}
+
+@if (mensaje) {
+  <p class="location-message">{{ mensaje }}</p>
+}
+
+@if (coincidencias.length > 0) {
+  <div class="address-results">
+    <p>Selecciona la dirección correcta:</p>
+    @for (opcion of coincidencias; track opcion.nombreCompleto) {
+      <button type="button" (click)="seleccionar(opcion)">
+        {{ opcion.nombreCompleto }}
+      </button>
+    }
+  </div>
+}
+
+@if (tienePunto) {
+  <div class="selected-location">
+    <strong>Ubicación confirmada</strong>
+    @if (textoDireccion) {
+      <span>{{ textoDireccion }}{{ comunaSeleccionada ? ', ' + comunaSeleccionada : '' }}</span>
+    }
+    @if (referenciaMapa) {
+      <small>Referencia del buscador: {{ referenciaMapa }}</small>
+    }
+    <small>Arrastra el marcador o toca el mapa para dejar exactamente la entrada correcta.</small>
+  </div>
+  <div #contenedorMapa class="address-map"></div>
+} @else {
+  <p class="location-pending">
+    Busca la dirección o elige el punto en el mapa.
+  </p>
+}

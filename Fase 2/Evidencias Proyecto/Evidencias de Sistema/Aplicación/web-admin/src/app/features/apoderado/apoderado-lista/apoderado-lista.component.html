@@ -1,0 +1,136 @@
+
+<div class="list-page fade-in">
+  <div class="list-header">
+    <div>
+      <h2>Gestión de Apoderados y Estudiantes</h2>
+      <p>Haz clic en cualquier apoderado para desplegar los estudiantes a su cargo.</p>
+    </div>
+    <div class="header-actions">
+      <a routerLink="/apoderados/ruts-habilitados" class="rs-btn rs-btn--secondary">
+        <span>Habilitación (estudiantes y apoderados)</span>
+      </a>
+      <a routerLink="/apoderados/nuevo" class="btn-primary rs-btn rs-btn--primary">
+        <span>+ Nuevo Apoderado</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="table-card glass-panel rs-card">
+    @if (apoderados.length === 0) {
+      <div class="empty-state">
+        <p>No hay apoderados registrados.</p>
+      </div>
+    } @else {
+      <div class="table-responsive rs-table-scroll">
+        <table class="custom-table rs-table rs-table--compact">
+          <thead>
+            <tr>
+              <th class="expand-col"></th>
+              <th>RUT</th>
+              <th>Nombre Completo</th>
+              <th>Teléfono</th>
+              <th>Usuario</th>
+              <th>Estudiantes</th>
+              <th class="actions-col">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (apoderado of apoderados; track apoderado.id) {
+              <tr class="clickable-row" (click)="toggleExpand(apoderado.id)">
+                <td class="expand-col">
+                  <span class="chevron" [class.open]="isExpanded(apoderado.id)">▶</span>
+                </td>
+                <td class="font-bold">{{ apoderado.rut }}</td>
+                <td>
+                  {{ apoderado.nombre_completo }}
+                  @if (otrosColegios(apoderado)) {
+                    <br /><small class="otros-colegios">También en: {{ otrosColegios(apoderado) }}</small>
+                  }
+                  @if (!puedeEditar(apoderado)) {
+                    <br /><small class="otros-colegios">Sus datos los administra {{ apoderado.colegio_nombre }}</small>
+                  }
+                </td>
+                <td>{{ apoderado.telefono }}</td>
+                <td><code>{{ apoderado.usuario }}</code></td>
+                <td>
+                  <span class="badge-count">
+                    {{ apoderado.estudiantes?.length || 0 }} {{ (apoderado.estudiantes?.length === 1) ? 'estudiante' : 'estudiantes' }}
+                  </span>
+                </td>
+                <td class="actions-col" (click)="$event.stopPropagation()">
+                  @if (puedeEditar(apoderado)) {
+                    <button type="button" class="btn-action edit" (click)="onEdit(apoderado.id)" title="Editar">
+                      ✏️
+                    </button>
+                  }
+                  <button type="button" class="btn-action delete" (click)="onDelete(apoderado)" title="Desactivar">
+                    🗑️
+                  </button>
+                </td>
+              </tr>
+
+              @if (isExpanded(apoderado.id)) {
+                <tr class="expanded-row">
+                  <td colspan="7">
+                    <div class="estudiantes-container">
+                      <h4>Estudiantes a cargo de {{ apoderado.nombre_completo }}:</h4>
+                      
+                      @if (!apoderado.estudiantes || apoderado.estudiantes.length === 0) {
+                        <p class="no-children">Este apoderado no tiene estudiantes asociados aún.</p>
+                      } @else {
+                        <table class="sub-table">
+                          <thead>
+                            <tr>
+                              <th>RUT</th>
+                              <th>Nombre Completo</th>
+                              <th>Curso</th>
+                              <th>Colegio</th>
+                              <th>Dirección Retiro</th>
+                              <th>Biometría Facial</th>
+                              <th>Acción Biométrica</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            @for (est of apoderado.estudiantes; track est.id) {
+                              <tr>
+                                <td><strong>{{ est.rut }}</strong></td>
+                                <td>{{ est.nombre_completo }}</td>
+                                <td>{{ est.curso }}</td>
+                                <td>{{ est.colegio }}</td>
+                                <td>{{ est.direccion_retiro }}</td>
+                                @if (est.biometria_autorizada === false) {
+                                  <td>
+                                    <span class="badge-status" style="background: #eef2ff; color: #3730a3;" title="El apoderado no autorizó el reconocimiento facial">
+                                      Solo QR
+                                    </span>
+                                  </td>
+                                  <td><span class="muted-text">Sin autorización</span></td>
+                                } @else {
+                                  <td>
+                                    <span class="badge-status" [style.background]="est.tiene_biometria ? 'rgba(34, 197, 94, 0.15)' : 'rgba(148, 163, 184, 0.15)'" [style.color]="est.tiene_biometria ? '#22c55e' : '#94a3b8'">
+                                      {{ est.tiene_biometria ? '🟢 Registrada' : '⚪ Sin Biometría' }}
+                                    </span>
+                                  </td>
+                                  <td>
+                                    <input type="file" #fileInput (change)="subirBiometriaEstudiante(est.id!, $event)" accept=".jpg,.jpeg,.png,image/jpeg,image/png" style="display: none;">
+                                    <button type="button" class="btn-action edit" (click)="fileInput.click()" title="Subir o actualizar foto biométrica del estudiante">
+                                      📸 {{ est.tiene_biometria ? 'Actualizar Rostro' : 'Cargar Rostro' }}
+                                    </button>
+                                  </td>
+                                }
+                              </tr>
+                            }
+                          </tbody>
+                        </table>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

@@ -1,0 +1,271 @@
+:host {
+  display: block;
+  padding: 30px;
+}
+
+.form-container {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.form-header {
+  margin-bottom: 24px;
+
+  h2 {
+    margin: 0;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--rs-text-dark);
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: var(--rs-muted);
+  }
+}
+
+.form-card {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 20px;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: 0 10px 30px rgba(40, 83, 78, 0.05);
+}
+
+.form-alert {
+  margin-bottom: 18px;
+  padding: 13px 16px;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  background: var(--rs-danger-soft);
+  color: #991b1b;
+  font-size: 14px;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  h3 {
+    margin: 0;
+    color: var(--rs-text-dark);
+    font-size: 17px;
+  }
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.location-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid #b9d9d4;
+  border-radius: 12px;
+  background: #f0f8f6;
+  color: var(--rs-text-dark);
+
+  span {
+    color: var(--rs-muted);
+    font-size: 13px;
+  }
+}
+
+.students-selector {
+  overflow: hidden;
+  border: 1.5px solid var(--rs-border);
+  border-radius: 14px;
+  background: #fbfdfc;
+}
+
+.students-selector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 48px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--rs-border);
+  background: #f0f8f6;
+  color: var(--rs-text-dark);
+
+  > strong {
+    font-size: 13px;
+  }
+}
+
+.select-all-option,
+.student-option {
+  cursor: pointer;
+  user-select: none;
+}
+
+.select-all-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--rs-primary);
+  font-size: 12px;
+  font-weight: 700;
+
+  input {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    accent-color: var(--rs-primary);
+  }
+}
+
+.students-list {
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 8px;
+  scrollbar-color: #9abbb6 transparent;
+  scrollbar-width: thin;
+}
+
+.student-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 54px;
+  padding: 9px 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  transition: background-color 150ms ease, border-color 150ms ease;
+
+  & + & {
+    margin-top: 5px;
+  }
+
+  &:hover {
+    background: #f3f9f7;
+  }
+
+  &.selected {
+    border-color: #b9d9d4;
+    background: #eaf5f2;
+  }
+
+  > input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+  }
+
+  > input:focus-visible + .student-check {
+    outline: 3px solid rgba(63, 129, 120, 0.22);
+    outline-offset: 2px;
+  }
+
+  > input:checked + .student-check {
+    border-color: var(--rs-primary);
+    background: var(--rs-primary);
+
+    &::after {
+      opacity: 1;
+    }
+  }
+}
+
+.student-check {
+  position: relative;
+  width: 19px;
+  height: 19px;
+  flex: 0 0 19px;
+  border: 1.5px solid #9eb6b2;
+  border-radius: 5px;
+  background: #fff;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 2px;
+    width: 5px;
+    height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    opacity: 0;
+    transform: rotate(45deg);
+  }
+}
+
+.student-info {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    overflow: hidden;
+    color: var(--rs-text-dark);
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  small {
+    color: var(--rs-muted);
+    font-size: 11px;
+  }
+}
+
+.students-empty {
+  padding: 24px 16px;
+  color: var(--rs-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.field-hint {
+  color: var(--rs-muted);
+  font-size: 12px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 10px;
+
+  button {
+    height: 46px;
+    padding: 0 20px;
+    border-radius: 12px;
+    font-weight: 700;
+  }
+
+}
+
+@media (max-width: 700px) {
+  :host { padding: 18px; }
+  .form-card { padding: 22px; }
+  .form-grid { grid-template-columns: 1fr; }
+  .full-width { grid-column: auto; }
+
+  .students-selector-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .students-list {
+    max-height: 240px;
+  }
+}

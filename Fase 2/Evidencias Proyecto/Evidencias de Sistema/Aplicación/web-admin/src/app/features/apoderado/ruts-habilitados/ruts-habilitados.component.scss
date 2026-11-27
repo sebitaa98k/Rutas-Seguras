@@ -1,0 +1,185 @@
+.list-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem;
+}
+
+.list-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.25rem 0;
+  }
+
+  p {
+    color: #64748b;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  a {
+    text-decoration: none;
+  }
+}
+
+.glass-panel {
+  padding: 1rem;
+}
+
+.rs-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.acciones .rs-btn {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.8rem;
+}
+
+.carga {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  label {
+    color: #334155;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  textarea {
+    width: 100%;
+    padding: 0.5rem 0.6rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font: inherit;
+    font-size: 0.875rem;
+    resize: vertical;
+    box-sizing: border-box;
+  }
+}
+
+.carga-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.resultado {
+  color: #334155;
+  font-size: 0.85rem;
+}
+
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    color: #334155;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  input,
+  select {
+    padding: 0.5rem 0.6rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 0.875rem;
+  }
+
+  .buscar {
+    flex: 1 1 240px;
+  }
+}
+
+.estado-lista {
+  margin: 0;
+  padding: 1rem;
+  color: #64748b;
+  text-align: center;
+
+  &.error {
+    color: #b91c1c;
+  }
+}
+
+.font-bold {
+  font-weight: 700;
+}
+
+.acciones {
+  white-space: nowrap;
+}
+
+small {
+  color: #64748b;
+}
+
+.etiqueta {
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 0.75rem;
+  font-weight: 600;
+
+  &.usado {
+    background: #e2e8f0;
+    color: #334155;
+  }
+}
+
+.pestanas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.pestana {
+  padding: 0.6rem 1rem;
+  border: none;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: #64748b;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &.activa {
+    color: #0f172a;
+    border-bottom-color: #0f766e;
+  }
+}
+
+.ayuda {
+  margin: 0;
+  color: #475569;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.aviso {
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  background: #fef3c7;
+  color: #92400e;
+  font-size: 0.9rem;
+}

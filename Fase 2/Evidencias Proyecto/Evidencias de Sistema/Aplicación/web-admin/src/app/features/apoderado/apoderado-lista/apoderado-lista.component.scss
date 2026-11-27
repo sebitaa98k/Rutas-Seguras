@@ -1,0 +1,178 @@
+.list-page { 
+  display: flex; 
+  flex-direction: column; 
+  gap: 1.5rem; 
+  padding: 1rem; 
+}
+
+.list-header { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0 0 0.25rem 0;
+  }
+
+  p {
+    color: #64748b;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}
+
+.btn-primary { 
+  padding: 0.6rem 1.2rem; 
+  border-radius: 6px; 
+  font-size: 0.875rem;
+  border: none;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+
+  a {
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+  }
+}
+
+.glass-panel { 
+  padding: 1rem; 
+}
+
+.clickable-row {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  &:hover { background-color: #f1f5f9; }
+}
+
+.expand-col { 
+  width: 30px; 
+  text-align: center; 
+}
+
+.chevron {
+  display: inline-block;
+  font-size: 0.7rem;
+  transition: transform 0.2s ease;
+  color: #64748b;
+  &.open { 
+    transform: rotate(90deg); 
+    color: #0284c7; 
+  }
+}
+
+.badge-count {
+  background: #e0f2fe; 
+  color: #0369a1; 
+  padding: 0.25rem 0.6rem; 
+  border-radius: 12px; 
+  font-size: 0.8rem; 
+  font-weight: 600;
+}
+
+/* ESTILOS DE LA FILA DESPLEGADA */
+.expanded-row {
+  background-color: #f8fafc;
+  td { 
+    padding: 1rem 1.5rem 1.5rem 2.5rem; 
+    color: #1e293b;
+  }
+}
+
+.estudiantes-container {
+  h4 { 
+    margin: 0 0 0.75rem 0; 
+    font-size: 0.9rem; 
+    color: #0f172a; 
+    font-weight: 700;
+  }
+}
+
+.no-children { 
+  color: #94a3b8; 
+  font-style: italic; 
+  font-size: 0.85rem; 
+  margin: 0; 
+}
+
+.sub-table {
+  width: 100%; 
+  border-collapse: collapse; 
+  background: #ffffff; 
+  border-radius: 8px; 
+  overflow: hidden; 
+  border: 1px solid #e2e8f0; 
+  font-size: 0.85rem;
+
+  th { 
+    background: #edf2f7; 
+    color: #334155; 
+    padding: 0.5rem 0.75rem; 
+    font-weight: 600;
+  }
+
+  td { 
+    padding: 0.55rem 0.75rem; 
+    border-bottom: 1px solid #edf2f7; 
+    color: #334155; // Texto oscuro visible en la subtabla
+  }
+
+  tr:last-child td {
+    border-bottom: none;
+  }
+}
+
+.badge-status {
+  background: #dcfce7; 
+  color: #15803d; 
+  padding: 0.2rem 0.5rem; 
+  border-radius: 4px; 
+  font-size: 0.75rem; 
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.actions-col { 
+  text-align: right; 
+  white-space: nowrap;
+}
+
+.btn-contract {
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--rs-radius-sm);
+  font-size: 0.8rem;
+}
+
+.btn-action { 
+  background: none; 
+  border: none; 
+  cursor: pointer; 
+  font-size: 1rem; 
+  margin-left: 0.5rem; 
+  padding: 0.25rem 0.4rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #e2e8f0;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+}
+
+.otros-colegios {
+  color: #64748b;
+  font-size: 0.8rem;
+}

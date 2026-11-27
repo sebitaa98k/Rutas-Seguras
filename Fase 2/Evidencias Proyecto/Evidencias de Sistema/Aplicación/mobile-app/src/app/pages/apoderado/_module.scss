@@ -1,0 +1,287 @@
+/* Fase 4A: capa visual compartida del módulo Apoderado. */
+:host {
+  --verde-rutas: var(--rs-color-primary);
+  --verde-rutas-oscuro: var(--rs-color-primary-hover);
+  --verde-suave: var(--rs-color-primary-soft);
+  --verde-muy-suave: var(--rs-color-primary-subtle);
+  --amarillo-escolar: var(--rs-color-accent);
+  --amarillo-suave: var(--rs-color-accent-soft);
+  --fondo: var(--rs-color-background);
+  --blanco: var(--rs-color-surface);
+  --texto-principal: var(--rs-color-text);
+  --texto-secundario: var(--rs-color-text-muted);
+  --texto-suave: var(--rs-color-text-soft);
+  --borde: var(--rs-color-border);
+  --borde-suave: var(--rs-color-border-soft);
+}
+
+.page-container,
+.detail-page,
+.seguimiento-page,
+.notifications-page-container,
+.profile-page-container {
+  color: var(--rs-color-text);
+  background: var(--rs-color-background);
+}
+
+.page-container,
+.seguimiento-page,
+.notifications-page-container,
+.profile-page-container {
+  padding-inline: var(--rs-page-padding-inline);
+}
+
+.section-label {
+  color: var(--rs-color-primary);
+  font-size: var(--rs-font-size-xs);
+  font-weight: var(--rs-font-weight-bold);
+  letter-spacing: 0.08em;
+}
+
+.section-header,
+.section-title,
+.section-title-bar {
+  margin-bottom: var(--rs-space-4);
+}
+
+.section-header h2,
+.section-title h2,
+.section-title-bar h2 {
+  color: var(--rs-color-text);
+  font-size: var(--rs-font-size-lg);
+  font-weight: var(--rs-font-weight-bold);
+}
+
+.child-card,
+.student-card,
+.tracking-card,
+.intro-card,
+.form-section,
+.info-card,
+.status-card,
+.trip-card,
+.student-select-card,
+.qr-card,
+.instructions-card,
+.notification-card,
+.profile-main-card,
+.edit-card,
+.password-form-card,
+.contract-status-card,
+.info-section,
+.authorized-card {
+  border: 1px solid var(--rs-color-border) !important;
+  border-radius: var(--rs-card-radius) !important;
+  background: var(--rs-color-surface) !important;
+  box-shadow: var(--rs-shadow-card) !important;
+}
+
+.child-card,
+.student-card,
+.tracking-card,
+.intro-card,
+.status-card,
+.trip-card,
+.student-select-card,
+.instructions-card,
+.notification-card,
+.profile-main-card,
+.edit-card,
+.password-form-card,
+.authorized-card {
+  padding: var(--rs-card-padding) !important;
+}
+
+.info-card,
+.info-box,
+.qr-subject-info,
+.security-note,
+.absence-banner {
+  border-color: var(--rs-color-border-soft) !important;
+  background: var(--rs-color-primary-subtle) !important;
+}
+
+.child-avatar,
+.student-avatar,
+.avatar-circle,
+.chip-avatar,
+.subject-avatar,
+.info-icon,
+.title-icon,
+.intro-icon,
+.tracking-icon,
+.instruction-header .icon-circle {
+  background: var(--rs-color-primary-soft) !important;
+  color: var(--rs-color-primary) !important;
+}
+
+.status-dot,
+.unread-indicator {
+  background: var(--rs-color-success) !important;
+}
+
+.course,
+.role-pill,
+.readonly-badge,
+.school-pill,
+.conductor-tag.assigned,
+.all-read-pill {
+  border-radius: var(--rs-radius-pill) !important;
+  background: var(--rs-color-success-soft) !important;
+  color: var(--rs-color-success) !important;
+}
+
+.unread-pill,
+.absence-tag,
+.timer-warning,
+.optional-number {
+  border-radius: var(--rs-radius-pill) !important;
+  background: var(--rs-color-warning-soft) !important;
+  color: var(--rs-color-warning) !important;
+}
+
+.notification-card:not(.read),
+.notification-card.unread {
+  border-left: 4px solid var(--rs-color-primary) !important;
+  background: var(--rs-color-primary-subtle) !important;
+}
+
+.input-item,
+.authorized-form ion-item {
+  --background: var(--rs-color-surface);
+  --color: var(--rs-color-text);
+  --placeholder-color: var(--rs-color-text-soft);
+  min-height: var(--rs-control-height);
+  border: 1px solid var(--rs-color-border) !important;
+  border-radius: var(--rs-input-radius) !important;
+}
+
+.input-item:focus-within,
+.authorized-form ion-item:focus-within {
+  border-color: var(--rs-color-primary) !important;
+  box-shadow: var(--rs-focus-ring) !important;
+}
+
+.primary-button,
+.add-button,
+.save-button,
+.save-edit-button,
+.save-btn,
+.action-btn.primary,
+.retry-button,
+.view-button {
+  --background: var(--rs-color-primary) !important;
+  --background-hover: var(--rs-color-primary-hover) !important;
+  --background-activated: var(--rs-color-primary-hover) !important;
+  --color: var(--rs-color-surface) !important;
+  border-radius: var(--rs-button-radius) !important;
+}
+
+.secondary-button,
+.details-button,
+.secondary-action,
+.action-btn.secondary,
+.photo-button-secondary,
+.cancel-btn {
+  --color: var(--rs-color-primary) !important;
+  --border-color: var(--rs-color-primary) !important;
+  border-radius: var(--rs-button-radius) !important;
+}
+
+.delete-authorized,
+.delete-item-btn,
+.delete-all,
+.logout-button {
+  color: var(--rs-color-danger) !important;
+}
+
+.loading-state,
+.loading-container,
+.empty-state,
+.error-state,
+.error-container {
+  width: 100%;
+  min-height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--rs-space-3);
+  padding: var(--rs-space-8) var(--rs-space-5);
+  border-radius: var(--rs-card-radius);
+  text-align: center;
+  color: var(--rs-color-text-muted);
+}
+
+.error-state,
+.error-container {
+  border: 1px solid var(--rs-color-danger);
+  background: var(--rs-color-danger-soft);
+}
+
+.empty-icon,
+.error-icon {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  border-radius: var(--rs-radius-lg) !important;
+  background: var(--rs-color-primary-soft) !important;
+  color: var(--rs-color-primary) !important;
+}
+
+.error-icon {
+  background: var(--rs-color-danger-soft) !important;
+  color: var(--rs-color-danger) !important;
+}
+
+.map-container {
+  overflow: hidden;
+  border: 1px solid var(--rs-color-border) !important;
+  border-radius: var(--rs-card-radius) !important;
+  box-shadow: var(--rs-shadow-card) !important;
+}
+
+.qr-code-frame {
+  border-color: var(--rs-color-border) !important;
+  border-radius: var(--rs-radius-lg) !important;
+  background: var(--rs-color-surface) !important;
+  box-shadow: var(--rs-shadow-card) !important;
+}
+
+.notification-title,
+.info-value,
+.subject-details h2,
+.child-text h3,
+.child-info h3 {
+  color: var(--rs-color-text) !important;
+}
+
+.notification-message,
+.timestamp,
+.school,
+.student-rut,
+.section-description,
+.photo-description,
+.footer-message,
+.footer-text {
+  color: var(--rs-color-text-muted) !important;
+}
+
+@media (max-width: 360px) {
+  .child-card,
+  .student-card,
+  .tracking-card,
+  .notification-card,
+  .profile-main-card,
+  .trip-card,
+  .qr-card {
+    padding: var(--rs-space-3) !important;
+  }
+
+  .section-header h2,
+  .section-title h2,
+  .section-title-bar h2 {
+    font-size: var(--rs-font-size-base);
+  }
+}

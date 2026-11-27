@@ -1,0 +1,264 @@
+:host {
+  display: block;
+
+  --verde-rutas: #0f766e;
+  --verde-suave: #e8f5f3;
+  --texto-principal: #173330;
+  --texto-secundario: #6b7c79;
+  --borde: #dce7e5;
+  --ambar: #92400e;
+  --ambar-suave: #fef3c7;
+}
+
+.attendance-section {
+  margin-bottom: 30px;
+}
+
+/* Misma cabecera que las demás secciones del detalle del hijo */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  margin-bottom: 14px;
+
+  span {
+    display: block;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: var(--verde-rutas);
+  }
+
+  h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--texto-principal);
+  }
+}
+
+.title-icon {
+  width: 39px;
+  height: 39px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: var(--verde-suave);
+  color: var(--verde-rutas);
+  border-radius: 12px;
+
+  ion-icon {
+    font-size: 20px;
+  }
+}
+
+.attendance-card {
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid var(--borde);
+  border-radius: 20px;
+}
+
+.attendance-loading,
+.attendance-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  color: var(--texto-secundario);
+
+  button {
+    margin-left: auto;
+    border: none;
+    background: transparent;
+    color: var(--verde-rutas);
+    font-weight: 700;
+    cursor: pointer;
+  }
+}
+
+.day-switch {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 4px;
+  background: #f2f8f7;
+  border-radius: 14px;
+
+  button {
+    position: relative;
+    padding: 9px;
+    border: none;
+    border-radius: 11px;
+    background: transparent;
+    color: var(--texto-secundario);
+    font-weight: 700;
+    cursor: pointer;
+
+    &.active {
+      background: #ffffff;
+      color: var(--verde-rutas);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+  }
+
+  .dot {
+    position: absolute;
+    top: 8px;
+    margin-left: 4px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d97706;
+  }
+}
+
+.attendance-hint {
+  margin: 12px 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: var(--texto-secundario);
+}
+
+.leg-list {
+  display: grid;
+  gap: 10px;
+}
+
+.leg-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--borde);
+  border-radius: 16px;
+
+  &.absent {
+    background: var(--ambar-suave);
+    border-color: #fcd34d;
+  }
+}
+
+.leg-icon {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 11px;
+  background: var(--verde-suave);
+  color: var(--verde-rutas);
+}
+
+.leg-info {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+
+  strong {
+    color: var(--texto-principal);
+
+    small {
+      font-weight: 500;
+      color: var(--texto-secundario);
+    }
+  }
+}
+
+.leg-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  color: var(--verde-rutas);
+
+  &.no {
+    color: var(--ambar);
+  }
+}
+
+.leg-lock {
+  font-size: 0.78rem;
+  color: var(--texto-secundario);
+}
+
+.leg-action {
+  flex-shrink: 0;
+  min-width: 72px;
+  padding: 9px 12px;
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+  background: #fffbeb;
+  color: var(--ambar);
+  font-weight: 800;
+  cursor: pointer;
+
+  &.undo {
+    border-color: #99d5cc;
+    background: var(--verde-suave);
+    color: var(--verde-rutas);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.reason-field {
+  display: grid;
+  gap: 5px;
+  margin-top: 12px;
+
+  span {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--texto-secundario);
+  }
+
+  input {
+    padding: 10px 12px;
+    border: 1px solid var(--borde);
+    border-radius: 12px;
+    font-size: 0.9rem;
+    color: var(--texto-principal);
+    background: #f7faf9;
+  }
+}
+
+.reason-saved {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: var(--texto-secundario);
+}
+
+.day-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+  padding: 13px;
+  border: none;
+  border-radius: 14px;
+  background: #d97706;
+  color: #ffffff;
+  font-weight: 800;
+  cursor: pointer;
+
+  &.undo {
+    background: var(--verde-rutas);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+  }
+
+  ion-spinner {
+    width: 18px;
+    height: 18px;
+  }
+}

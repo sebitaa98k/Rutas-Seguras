@@ -1,0 +1,493 @@
+<ion-content [fullscreen]="true">
+
+  <div class="route-page">
+
+    <!-- =================================
+         ENCABEZADO
+    ================================== -->
+    <section class="route-header rs-page-header">
+
+      <div>
+        <span class="section-label">RUTA ACTIVA</span>
+        <h1>{{ ruta?.nombre || 'Recorrido' }}</h1>
+        <p>{{ ruta?.colegio_nombre || 'Ruta escolar' }} &bull; {{ paradas.length }} estudiantes</p>
+      </div>
+
+      <ion-menu-toggle menu="main-menu">
+        <button class="menu-button rs-header-action" type="button" title="Abrir menú">
+          <ion-icon name="menu-outline"></ion-icon>
+        </button>
+      </ion-menu-toggle>
+
+    </section>
+
+
+    @if (!rutaIniciada) {
+      <section class="start-route-card">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+        <div>
+          @if (esIda) {
+            <strong>Recorrido de ida</strong>
+            <p>Al iniciar irás a buscar a cada estudiante en orden. Marca su rostro cuando suba y la ruta pasará sola al siguiente.</p>
+          } @else {
+            <strong>Recorrido de vuelta</strong>
+            <p>Al iniciar, marca la subida de cada estudiante en el colegio. Luego irás a dejarlos a sus casas.</p>
+          }
+        </div>
+        <button type="button" (click)="iniciarRecorrido()" [disabled]="iniciandoRuta">
+          @if (iniciandoRuta) { <ion-spinner name="crescent"></ion-spinner> }
+          @else { <ion-icon name="play-circle-outline"></ion-icon> }
+          {{ iniciandoRuta ? 'Iniciando...' : 'Iniciar ruta' }}
+        </button>
+      </section>
+    }
+
+    <!-- =================================
+         ESTADO
+    ================================== -->
+    <div class="active-status">
+
+      <div class="status-left">
+        <span class="status-dot" [class.completed-dot]="todasCompletadas"></span>
+
+        <div>
+          <strong>{{ !rutaIniciada ? 'Preparando recorrido' : (todasCompletadas ? (esIda ? 'Dirigiéndose al colegio' : 'Recorrido finalizado') : 'Ruta en curso') }}</strong>
+          <span>{{ !rutaIniciada ? 'Presiona Iniciar ruta para comenzar' : (todasCompletadas ? 'Paradas completadas' : 'Parada ' + (paradaActualIndex + 1) + ' de ' + paradas.length) }}</span>
+        </div>
+      </div>
+
+      <span class="elapsed-time">
+        {{ tiempoFormateado }}
+      </span>
+
+    </div>
+
+    <!-- Aviso fijo mientras el teléfono no entregue la ubicación (permiso denegado o GPS apagado). -->
+    @if (rutaIniciada && avisoUbicacion) {
+      <div class="aviso-ubicacion" role="alert">
+        <ion-icon name="warning-outline" aria-hidden="true"></ion-icon>
+        <span>{{ avisoUbicacion }}</span>
+      </div>
+    }
+
+
+    <!-- =================================
+         MAPA REAL (solo después de iniciar)
+    ================================== -->
+    @if (rutaIniciada) {
+      <section class="map-card real-map-card">
+        <!-- El botón va anclado al mapa, sobre los créditos de OpenStreetMap. -->
+        <div class="mapa-contenedor">
+          <div id="mapa-ruta-conductor" class="leaflet-route-map"></div>
+
+          <button class="map-button" type="button" (click)="centrarUbicacion()">
+            <ion-icon name="locate-outline"></ion-icon>
+            Mi ubicación
+          </button>
+        </div>
+
+        <div class="route-metrics">
+          @if (distanciaRutaKm !== undefined) {
+            <span><strong>{{ distanciaRutaKm }} km</strong> estimados</span>
+          }
+          @if (duracionRutaMin !== undefined) {
+            <span><strong>{{ duracionRutaMin }} min</strong> estimados</span>
+          }
+        </div>
+
+        @if (simulacionDisponible) {
+          <div class="simulador" role="group" aria-label="Simulador de ruta">
+            <div class="simulador-info">
+              <span class="simulador-etiqueta">Simulación</span>
+              <span class="simulador-ayuda">{{ simulando ? 'Avanzando…' : 'Presiona ▶ para avanzar' }}</span>
+            </div>
+            <div class="simulador-controles">
+              <button type="button" class="simulador-play" (click)="alternarSimulacion()"
+                [attr.aria-label]="simulando ? 'Pausar simulación' : 'Avanzar simulación'">
+                {{ simulando ? '⏸' : '▶' }}
+              </button>
+              @for (velocidad of velocidadesSimulacion; track velocidad) {
+                <button type="button" class="simulador-velocidad" [class.activa]="velocidad === velocidadSimulacion"
+                  [attr.aria-pressed]="velocidad === velocidadSimulacion"
+                  (click)="cambiarVelocidadSimulacion(velocidad)">x{{ velocidad }}</button>
+              }
+            </div>
+          </div>
+        }
+      </section>
+    } @else {
+      <section class="map-locked-card">
+        <ion-icon name="location-outline"></ion-icon>
+        <div>
+          <strong>El mapa se mostrará al iniciar la ruta</strong>
+          <p>Revisa los estudiantes asignados y presiona “Iniciar ruta” cuando estés listo.</p>
+        </div>
+      </section>
+    }
+
+
+    @if (avisoAbordaje) {
+      <section class="boarding-notice" [class.outside-home]="avisoFueraDeDomicilio">
+        <ion-icon [name]="avisoFueraDeDomicilio ? 'warning-outline' : 'checkmark-circle-outline'"></ion-icon>
+        <p>{{ avisoAbordaje }}</p>
+        <button type="button" (click)="avisoAbordaje = ''" title="Cerrar aviso">✕</button>
+      </section>
+    }
+
+    <!-- =================================
+         PRÓXIMA PARADA
+    ================================== -->
+    @if (vueltaSinReparto) {
+
+      <section class="next-stop-section finished-banner">
+
+        <div class="finished-card">
+
+          <ion-icon name="school-outline"></ion-icon>
+
+          <h3>Subida en el colegio</h3>
+
+          @if (rutaIniciada) {
+            <p>{{ aBordoCount }} a bordo · {{ noSubieronCount }} no subió · {{ faltanPorSubirCount }} por indicar</p>
+          } @else {
+            <p>Presiona "Iniciar ruta" para comenzar a marcar las subidas.</p>
+          }
+
+        </div>
+
+      </section>
+
+    } @else if (paradaActual) {
+
+      <section class="next-stop-section">
+
+        <div class="section-heading">
+
+          <div>
+            <span>{{ esIda || !paradaActual.abordo ? 'SIGUIENTE EN SUBIR' : 'PRÓXIMA ENTREGA' }}</span>
+            <h2>{{ paradaActual.estudiante }}</h2>
+          </div>
+
+          <span class="stop-number">
+            {{ numeroDosDigitos(paradaActual.numero) }} / {{ numeroDosDigitos(paradas.length) }}
+          </span>
+
+        </div>
+
+
+        <div class="next-stop-card">
+
+          <div class="stop-icon">
+            <ion-icon name="location-outline"></ion-icon>
+          </div>
+
+          <div class="stop-info">
+
+            <strong>
+              {{ paradaActual.direccion }}
+            </strong>
+
+            <p>
+              Dirección confirmada por el apoderado.
+            </p>
+
+            <div class="receiver-info">
+
+              <ion-icon name="person-outline"></ion-icon>
+
+              <div>
+                <span>CONTACTOS</span>
+                @for (contacto of paradaActual.contactos; track $index) {
+                <strong>
+                  {{ contacto.nombre }} &bull; {{ contacto.rol }}
+                </strong>
+                }
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    } @else {
+
+      <section class="next-stop-section finished-banner">
+
+        <div class="finished-card">
+
+          <ion-icon [name]="esIda ? 'school-outline' : 'checkmark-done-circle-outline'"></ion-icon>
+
+          @if (esIda && rutaIniciada) {
+            <h3>Dirigiéndose al colegio</h3>
+            <p>Todos los estudiantes ya subieron, fueron marcados como ausentes o no asisten hoy. Dirígete a {{ destinoNombre }} y presiona "Finalizar ruta" al llegar.</p>
+          } @else if (volviendoAlColegio) {
+            <h3>Volviendo al colegio</h3>
+            <p>{{ noRecibidosCount }} {{ noRecibidosCount === 1 ? 'niño vuelve' : 'niños vuelven' }} a {{ destinoNombre }} porque nadie los recibió.</p>
+          } @else {
+            <h3>¡Todas las paradas han sido completadas!</h3>
+            <p>Puedes presionar "Finalizar ruta" para dar por concluido el recorrido de hoy.</p>
+          }
+
+        </div>
+
+      </section>
+
+    }
+
+
+    <!-- =================================
+         ACCIONES
+    ================================== -->
+    <section class="actions-section">
+
+      @if (esIda) {
+        <!-- En la ida, el rostro del estudiante confirma la parada: no hace falta "Confirmar llegada". -->
+        <button
+          class="primary-action"
+          type="button"
+          [disabled]="!rutaIniciada || todasCompletadas"
+          (click)="irAEscaneoFacial()">
+          <ion-icon name="scan-outline"></ion-icon>
+          {{ todasCompletadas ? 'Todos a bordo' : 'Marcar biometría' }}
+        </button>
+
+        @if (rutaIniciada && paradaActual) {
+          <button
+            class="absent-action"
+            type="button"
+            [disabled]="marcandoAusente"
+            (click)="marcarAusente()">
+            <ion-icon name="person-remove-outline"></ion-icon>
+            {{ marcandoAusente ? 'Marcando...' : 'No se presentó' }}
+          </button>
+          <!-- Solo avisa al apoderado de este niño; la parada se completa cuando sube. -->
+          <button class="absent-action notify-action" type="button" [disabled]="avisandoLlegada" (click)="avisarLlegada()">
+            <ion-icon name="notifications-outline"></ion-icon>
+            {{ avisandoLlegada ? 'Avisando...' : 'Avisar llegada al apoderado' }}
+          </button>
+        }
+      } @else {
+        @if (faseSubida) {
+          <button class="primary-action" type="button" (click)="escanearSubida()">
+            <ion-icon name="scan-outline"></ion-icon>
+            Escanear subida
+          </button>
+          @if (aBordoCount > 0 || faltanPorSubirCount > 0) {
+            <button class="primary-action reparto-action" type="button" [disabled]="!puedeIniciarReparto" (click)="iniciarReparto()">
+              <ion-icon name="flag-outline"></ion-icon>
+              {{ iniciandoReparto ? 'Iniciando...' : 'Iniciar reparto' }}
+            </button>
+          }
+          @if (faltanPorSubirCount > 0) {
+            <p class="action-note">Para iniciar el reparto, cada niño debe estar a bordo o marcado "No subió".</p>
+          }
+        } @else if (todasCompletadas) {
+          <button class="primary-action" type="button" disabled>
+            <ion-icon name="checkmark-circle-outline"></ion-icon>
+            Paradas completadas
+          </button>
+        } @else if (accionVuelta(paradaActual) === 'abordar') {
+          <button class="primary-action" type="button" (click)="irAEscaneoFacial(paradaActual)">
+            <ion-icon name="scan-outline"></ion-icon>
+            Marcar subida de {{ paradaActual?.estudiante }}
+          </button>
+          <button class="absent-action" type="button" [disabled]="marcandoAusente" (click)="marcarAusente()">
+            <ion-icon name="person-remove-outline"></ion-icon>
+            {{ marcandoAusente ? 'Marcando...' : 'No subió' }}
+          </button>
+        } @else if (accionVuelta(paradaActual) === 'entregar') {
+          <button class="primary-action" type="button" (click)="irAEscaneoFacial(paradaActual)">
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+            Entregar a {{ paradaActual?.estudiante }}
+          </button>
+          <button class="absent-action notify-action" type="button" [disabled]="avisandoLlegada" (click)="avisarLlegada()">
+            <ion-icon name="notifications-outline"></ion-icon>
+            {{ avisandoLlegada ? 'Avisando...' : 'Avisar llegada al apoderado' }}
+          </button>
+          <p class="action-note">El aviso solo notifica que llegaste. La entrega se registra con rostro o QR de quien recibe.</p>
+          <button class="absent-action" type="button" [disabled]="!paradaActual?.llamado || marcandoAusente" (click)="noSeRecibio()">
+            <ion-icon name="person-remove-outline"></ion-icon>
+            No se recibió
+          </button>
+          @if (!paradaActual?.llamado) {
+            <p class="action-note">Para marcar "No se recibió", primero llama con el botón "Llamar" de {{ paradaActual?.estudiante }}.</p>
+          }
+        } @else if (volviendoAlColegio) {
+          <p class="action-note">Dirígete a {{ destinoNombre }}. Al llegar, presiona "Finalizar ruta" y escanea el QR del inspector.</p>
+        } @else {
+          <p class="action-note">Presiona "Iniciar ruta" para comenzar a marcar las subidas.</p>
+        }
+      }
+
+
+      <!-- El QR siempre está disponible: es la vía de los niños sin biometría autorizada y el respaldo del rostro. -->
+      <div class="secondary-actions" [class.single-action]="!rutaIniciada">
+
+        @if (rutaIniciada) {
+          <button class="secondary-action" type="button" [disabled]="!puedeUsarQR" (click)="irAEscanearQR()">
+            <ion-icon name="qr-code-outline"></ion-icon>
+            {{ esIda || faseSubida || accionVuelta(paradaActual) === 'abordar' ? 'Subir con QR' : 'Entregar con QR' }}
+          </button>
+        }
+
+        <button class="secondary-action danger-action" type="button" (click)="irAEmergencia()">
+          <ion-icon name="warning-outline"></ion-icon>
+          Emergencia
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================
+         LISTA DE PARADAS
+    ================================== -->
+    <section class="stops-section">
+
+      <div class="section-heading">
+
+        <div>
+          <span>RECORRIDO</span>
+          <h2>Paradas</h2>
+        </div>
+
+        <span class="completed-count">
+          {{ completadasCount }} completadas
+        </span>
+
+      </div>
+
+
+      <div class="stops-list">
+
+        @for (parada of paradas; track parada.id) {
+
+          <article class="stop-card" [class.active-stop]="parada.estado === 'actual'" [class.completed-stop]="parada.estado === 'completada' || parada.estado === 'ausente' || parada.estado === 'entregado'" [class.not-attending-stop]="parada.estado === 'no_asiste'">
+
+            <div class="stop-indicator">
+              <span>{{ parada.numero }}</span>
+            </div>
+
+            <div class="stop-content">
+
+              <div class="stop-top">
+
+                <h3>{{ parada.estudiante }}</h3>
+
+                <span
+                  class="stop-status"
+                  [class.oculto]="faseSubida && parada.abordo"
+                  [class.current]="parada.estado === 'actual'"
+                  [class.pending]="parada.estado === 'pendiente'"
+                  [class.completed]="parada.estado === 'completada'"
+                  [class.absent]="parada.estado === 'ausente'"
+                  [class.not-attending]="parada.estado === 'no_asiste'">
+
+                  {{ parada.estado === 'actual' ? 'Actual' : (parada.estado === 'entregado' ? 'Entregado ✓' : (parada.estado === 'completada' ? (esIda ? 'Subió ✓' : 'Completada ✓') : (parada.estado === 'ausente' ? (esIda ? 'No se presentó' : 'No subió') : (parada.estado === 'no_asiste' ? 'No asiste hoy' : (parada.estado === 'no_recibido' ? 'Vuelve al colegio' : 'Pendiente'))))) }}
+
+                </span>
+
+                @if (!esIda && parada.abordo && (parada.estado === 'actual' || parada.estado === 'pendiente')) {
+                  <span class="stop-status completed">A bordo ✓</span>
+                }
+
+                @if (parada.soloQr && (parada.estado === 'actual' || parada.estado === 'pendiente')) {
+                  <span class="stop-status solo-qr" title="Su apoderado no autorizó el reconocimiento facial">Solo QR</span>
+                }
+
+              </div>
+
+              <p>{{ parada.direccion }} &bull; {{ parada.colegioOCurso }}</p>
+
+              @if (parada.estado === 'no_asiste') {
+                <span class="not-attending-note">Su apoderado avisó que hoy no usará el furgón. No pases por su casa.</span>
+              }
+
+              @for (contacto of parada.contactos; track $index) {
+              <span class="receiver-small">
+                {{ contacto.rol }}: {{ contacto.nombre }}
+              </span>
+              }
+
+              @if (faseSubida) {
+                @if (!parada.abordo && parada.estado === 'pendiente') {
+                  <button class="stop-action stop-action-warn" type="button" [disabled]="marcandoAusente" (click)="marcarAusente(parada)">
+                    <ion-icon name="person-remove-outline"></ion-icon>
+                    No subió
+                  </button>
+                }
+                @if (parada.estado === 'ausente') {
+                  <button class="stop-action" type="button" (click)="irAEscaneoFacial(parada)">
+                    <ion-icon name="scan-outline"></ion-icon>
+                    Subió después
+                  </button>
+                }
+                @if (parada.abordo && parada.estado === 'pendiente') {
+                  <button class="stop-action stop-action-warn" type="button" [disabled]="marcandoAusente" (click)="corregirAbordaje(parada)">
+                    <ion-icon name="person-remove-outline"></ion-icon>
+                    Corregir: no subió
+                  </button>
+                }
+              }
+
+              @if (rutaIniciada && !esIda && !vueltaSinReparto) {
+                <button class="stop-action" type="button" (click)="llamar(parada)">
+                  <ion-icon name="call-outline"></ion-icon>
+                  Llamar
+                </button>
+                @if (parada.estado === 'no_recibido') {
+                  <button class="stop-action" type="button" [disabled]="marcandoAusente" (click)="apoderadoDisponible(parada)">
+                    <ion-icon name="checkmark-circle-outline"></ion-icon>
+                    Apoderado disponible
+                  </button>
+                }
+              }
+
+            </div>
+
+          </article>
+
+        }
+
+      </div>
+
+    </section>
+
+
+    <!-- =================================
+         FINALIZAR
+    ================================== -->
+    @if (rutaIniciada && !puedeFinalizar && !finalizandoRuta) {
+      <p class="finish-hint">
+        {{ esIda ? 'Para finalizar, pasa por todas las casas: sube a cada estudiante o márcalo como ausente.' : (vueltaSinReparto ? 'Para finalizar, primero marca las subidas e inicia el reparto.' : 'Para finalizar, entrega a cada estudiante en orden.') }}
+      </p>
+    }
+    <button class="finish-route-button" type="button" [disabled]="!puedeFinalizar" (click)="finalizarRuta()">
+
+      <ion-icon name="flag-outline"></ion-icon>
+
+      {{ finalizandoRuta ? 'Finalizando...' : 'Finalizar ruta' }}
+
+    </button>
+
+
+    <p class="footer-text">
+      Tu ruta escolar, más segura.
+    </p>
+
+  </div>
+
+  <ion-toast
+    [isOpen]="mostrarToast"
+    [message]="mensajeToast"
+    [duration]="2500"
+    [color]="colorToast"
+    (didDismiss)="mostrarToast = false">
+
+  </ion-toast>
+
+</ion-content>

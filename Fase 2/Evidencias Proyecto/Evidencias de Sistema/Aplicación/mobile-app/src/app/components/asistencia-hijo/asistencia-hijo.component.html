@@ -1,0 +1,112 @@
+<section class="attendance-section">
+
+  <div class="section-title">
+    <div class="title-icon">
+      <ion-icon name="calendar-outline"></ion-icon>
+    </div>
+    <div>
+      <span>FURGÓN</span>
+      <h2>Asistencia</h2>
+    </div>
+  </div>
+
+  <div class="attendance-card">
+
+    @if (cargando && !estado) {
+      <div class="attendance-loading">
+        <ion-spinner name="crescent"></ion-spinner>
+        <span>Cargando asistencia...</span>
+      </div>
+    } @else if (error && !estado) {
+      <p class="attendance-error">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        {{ error }}
+        <button type="button" (click)="cargar()">Reintentar</button>
+      </p>
+    } @else if (dia) {
+
+      <div class="day-switch" role="tablist">
+        @for (opcion of estado?.dias || []; track opcion.fecha; let i = $index) {
+          <button
+            type="button"
+            role="tab"
+            [class.active]="i === diaIndex"
+            [attr.aria-selected]="i === diaIndex"
+            (click)="seleccionarDia(i)">
+            {{ opcion.etiqueta }}
+            @if (opcion.ida.no_asiste || opcion.vuelta.no_asiste) {
+              <span class="dot" title="Tiene aviso de inasistencia"></span>
+            }
+          </button>
+        }
+      </div>
+
+      <p class="attendance-hint">
+        Si {{ diaTexto }} no enviarás a {{ nombre || 'tu hijo/a' }} en el furgón, avísalo aquí:
+        el conductor dejará de pasar por él y lo verá en su ruta, incluso si ya está en recorrido.
+      </p>
+
+      <div class="leg-list">
+        @for (tramo of tramos; track tramo.clave) {
+          <div class="leg-row" [class.absent]="tramo.estado.no_asiste">
+            <div class="leg-icon">
+              <ion-icon [name]="tramo.icono"></ion-icon>
+            </div>
+
+            <div class="leg-info">
+              <strong>{{ tramo.titulo }} <small>{{ tramo.detalle }}</small></strong>
+              <span class="leg-status" [class.no]="tramo.estado.no_asiste">
+                <ion-icon [name]="tramo.estado.no_asiste ? 'close-circle-outline' : 'checkmark-circle-outline'"></ion-icon>
+                {{ tramo.estado.no_asiste ? 'No usará el furgón' : 'Usará el furgón' }}
+              </span>
+              @if (tramo.estado.bloqueo) {
+                <span class="leg-lock">{{ tramo.estado.bloqueo }}</span>
+              } @else if (!tramo.estado.tiene_ruta) {
+                <span class="leg-lock">Aún no tiene ruta de {{ tramo.clave }} asignada.</span>
+              }
+            </div>
+
+            <button
+              type="button"
+              class="leg-action"
+              [class.undo]="tramo.estado.no_asiste"
+              [disabled]="guardando || !!tramo.estado.bloqueo"
+              (click)="tramo.estado.no_asiste ? cancelar(tramo.clave) : avisar(tramo.clave)">
+              {{ tramo.estado.no_asiste ? 'Sí irá' : 'No irá' }}
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (!diaCompletoAvisado) {
+        <label class="reason-field">
+          <span>Motivo (opcional)</span>
+          <input
+            type="text"
+            maxlength="200"
+            placeholder="Ej: enfermo, hora médica"
+            [(ngModel)]="motivo"
+            [disabled]="guardando" />
+        </label>
+      } @else if (dia.motivo) {
+        <p class="reason-saved">Motivo: {{ dia.motivo }}</p>
+      }
+
+      @if (puedeAvisarDiaCompleto) {
+        <button type="button" class="day-action" [disabled]="guardando" (click)="avisar('ambos')">
+          @if (guardando) { <ion-spinner name="crescent"></ion-spinner> }
+          @else { <ion-icon name="bus-outline"></ion-icon> }
+          No irá a clases {{ diaTexto }}
+        </button>
+      } @else if (diaCompletoAvisado && !tramos[0].estado.bloqueo && !tramos[1].estado.bloqueo) {
+        <button type="button" class="day-action undo" [disabled]="guardando" (click)="cancelar('ambos')">
+          @if (guardando) { <ion-spinner name="crescent"></ion-spinner> }
+          @else { <ion-icon name="checkmark-circle-outline"></ion-icon> }
+          Sí irá a clases {{ diaTexto }}
+        </button>
+      }
+    }
+
+  </div>
+
+</section>
