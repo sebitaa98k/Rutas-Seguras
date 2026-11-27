@@ -1,0 +1,10 @@
+Django==6.1
+cryptography==50.0.2
+django-cors-headers==4.9.0
+djangorestframework==3.18.0
+firebase-admin==6.6.0
+numpy==2.2.5
+opencv-python-headless==5.0.0.93
+pillow==10.3.0
+python-dotenv==1.2.2
+requests==2.34.2
